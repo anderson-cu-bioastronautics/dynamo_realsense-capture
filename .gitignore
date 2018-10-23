@@ -2,3 +2,6 @@ text
 .vscode/settings.json
 .vscode/launch.json
 helperfunctions/__pycache__
+*.ply
+exampleRotationtranslatation.txt
+scratch.py
