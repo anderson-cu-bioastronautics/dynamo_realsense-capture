@@ -74,14 +74,15 @@ class Calibrate():
                 observedchessboardCentered = validobservedchessboardPoints - rmsd.centroid(validobservedchessboardPoints)
                 rotationMatrix = rmsd.kabsch(chessboardPointsCentered, observedchessboardCentered)
                 rmsdValue = rmsd.kabsch_rmsd(chessboardPointsCentered, observedchessboardCentered)
-                #translationVector = rmsd.centroid(observedchessboardCentered) - np.matmul(rmsd.centroid(chessboardPointsCentered), rotationMatrix)
-                translationVector = rmsd.centroid(validobservedchessboardPoints) - np.matmul(rmsd.centroid(validchessboardPoints), rotationMatrix)
-                #rotationMatrix = rotationMatrix.transpose()
+                distancesVector = rmsd.centroid(validobservedchessboardPoints) - np.matmul(rmsd.centroid(validchessboardPoints), rotationMatrix)
+                translationVector = -np.matmul(np.transpose(rotationMatrix), np.transpose(distancesVector.flatten()))
+                
+                
                 poseMat = np.zeros((4,4))
                 poseMat[:3,:3] = rotationMatrix
-                poseMat[:3,3] = translationVector.flatten()
+                poseMat[:3,3] = translationVector
                 poseMat[3,3] = 1
-                self.devicesTransformation[serial] = [poseMat, rotationMatrix.transpose(), translationVector.transpose(), rmsdValue]
+                self.devicesTransformation[serial] = [poseMat, rmsdValue]
 
     
 class AlignedData():
@@ -92,7 +93,7 @@ class AlignedData():
         self.stream()
         
 
-    def depthFrametoPC(self, depthFrame, cameraIntrinsics, poseMat, rotationMatrix, translationVector):
+    def depthFrametoPC(self, depthFrame, cameraIntrinsics, poseMat):
         [height, width] = [depthFrame.get_height(), depthFrame.get_width()]
         nx = np.linspace(0, width-1, width)
         ny = np.linspace(0, height-1, height)
@@ -109,11 +110,11 @@ class AlignedData():
 
         points = np.asanyarray([x,y,z])
 
-        rot = np.transpose(rotationMatrix)
-        trans = -np.matmul(np.transpose(rotationMatrix), translationVector)
-        poseMat[:3,:3] = rot
-        poseMat[:3,3] = trans
-        poseMat[3,3] = 1
+        #rot = np.transpose(rotationMatrix)
+        #trans = -np.matmul(np.transpose(rotationMatrix), translationVector)
+        #poseMat[:3,:3] = rot
+        #poseMat[:3,3] = trans
+        #poseMat[3,3] = 1
 
         n = points.shape[1] 
         points_ = np.vstack((points, np.ones((1,n))))
@@ -123,13 +124,13 @@ class AlignedData():
 
     
     def stream(self):
-        for (serial, [poseMat, rotationMatrix, translationVector, rmsdValue]) in self.devicesTransformation.items():
+        for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
             cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
             frames = self.deviceManager.poll_frames()[serial]
             depthFrame = frames[rs.stream.depth]
             colorFrame = frames[rs.stream.color]
 
-            points = self.depthFrametoPC(depthFrame, self.devicesIntrinsics[serial][rs.stream.depth], poseMat, rotationMatrix, translationVector)
+            points = self.depthFrametoPC(depthFrame, self.devicesIntrinsics[serial][rs.stream.depth], poseMat)
             #print("wait")
             dt = [("x", 'f4'), ("y", 'f4'), ("z", 'f4')]
             verts = np.array(list(zip(*points.T)), dtype=dt)
@@ -155,10 +156,10 @@ if __name__=="__main__":
     rsConfig = rs.config()
     resolutionWidth = 848
     resolutionHeight = 480
-    frameRate = 90
-    #rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
-    #rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.rgb8, frameRate)
-    #rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
+    frameRate = 30
+    rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
+    rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
+    rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_devices(enable_ir_emitter=True)

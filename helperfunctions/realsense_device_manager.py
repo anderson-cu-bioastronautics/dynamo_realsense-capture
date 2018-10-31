@@ -7,6 +7,7 @@
 
 import pyrealsense2 as rs
 import numpy as np
+import time
 
 """
   _   _        _                      _____                     _    _                    
@@ -150,6 +151,7 @@ class DeviceManager:
 
         # Enable the device
         self._config.enable_device(device_serial)
+        #time.sleep(5)
         pipeline_profile = pipeline.start(self._config)
 
         # Set the acquisition parameters
@@ -194,33 +196,43 @@ class DeviceManager:
             device = device.pipeline_profile.get_device()
             advanced_mode = rs.rs400_advanced_mode(device)
             advanced_mode.load_json(json_text)
-
+    
     def poll_frames(self):
         """
         Poll for frames from the enabled Intel RealSense devices.
         This function is modified to return frame objects which are of their inherent format from the pyrealsense2 libray.
         """
-
-        frameCollection = {}
-        for (serial, device) in self._enabled_devices.items():
-            frameCollection[serial] = {}
-            pipeline = device.pipeline
-            streams = device.pipeline_profile.get_streams()
-            frames = pipeline.wait_for_frames()
-            for stream in streams:
-                if stream.stream_type() == rs.stream.infrared:
-                    key_ = (stream.stream_type(), stream.stream_index())
-                    frame = frames.get_infrared_frame(stream.stream_index())
-                elif stream.stream_type() == rs.stream.depth:
-                    key_ = stream.stream_type()
-                    frame = frames.get_depth_frame()
-                elif stream.stream_type() == rs.stream.color:
-                    key_ = stream.stream_type()
-                    frame = frames.get_color_frame()
-                frameCollection[serial][key_] = frame
-        return frameCollection
-
+        try:
+            frameCollection = {}
+            for (serial, device) in self._enabled_devices.items():
+                frameCollection[serial] = {}
+                pipeline = device.pipeline
+                streams = device.pipeline_profile.get_streams()
+                #frames = pipeline.wait_for_frames() 
                 
+                frames = rs.composite_frame(rs.frame())
+                if pipeline.poll_for_frames(frames):
+                    #return frames
+                #else:
+                    #rs.log_to_console(rs.log_severity.debug)
+                    #rs.release_frame(frames)
+                    for stream in streams:
+                        if stream.stream_type() == rs.stream.infrared:
+                            key_ = (stream.stream_type(), stream.stream_index())
+                            frame = frames.first_or_default(stream.stream_type()).as_video_frame()
+                        elif stream.stream_type() == rs.stream.depth:
+                            key_ = stream.stream_type()
+                            frame = frames.first_or_default(stream.stream_type()).as_depth_frame()
+                        elif stream.stream_type() == rs.stream.color:
+                            key_ = stream.stream_type()
+                            frame = frames.first_or_default(stream.stream_type()).as_video_frame()
+                        frameCollection[serial][key_] = frame
+                
+            return frameCollection
+
+        except:
+            pass
+    
 
     # def poll_frames(self):
     #     """
