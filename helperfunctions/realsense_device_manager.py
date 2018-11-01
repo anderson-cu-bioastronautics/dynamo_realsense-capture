@@ -226,8 +226,9 @@ class DeviceManager:
                         elif stream.stream_type() == rs.stream.color:
                             key_ = stream.stream_type()
                             frame = frames.first_or_default(stream.stream_type()).as_video_frame()
+                        
                         frameCollection[serial][key_] = frame
-                
+                    frames.keep()
             return frameCollection
 
         except:

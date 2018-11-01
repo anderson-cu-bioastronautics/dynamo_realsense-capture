@@ -19,7 +19,7 @@ class Capture():
                 #for (serial, [poseMat, rmsdValue]) in self.transformation.items(): 
                 timeFrame = self.deviceManager.poll_frames()
                 self.frames[timeStamp] = timeFrame
-                print(self.frames[timeStamp]['822512060553'][rs.stream.depth].get_frame_number())
+                print(timeFrame['822512060553'][rs.stream.depth].get_frame_number())
             except:
                 pass
 
@@ -30,7 +30,7 @@ if __name__=="__main__":
     frameRate = 60
     rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
     rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
-    rsConfig.enable_stream(rs.stream.infrared, 2, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
+    #rsConfig.enable_stream(rs.stream.infrared, 2, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_devices(enable_ir_emitter=True)
