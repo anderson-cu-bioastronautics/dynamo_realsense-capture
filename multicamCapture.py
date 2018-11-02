@@ -4,6 +4,8 @@ import cv2
 from multicamManager import Calibrate
 from helperfunctions.realsense_device_manager import DeviceManager
 import time
+from helperfunctions.realsense_device_manager import post_process_depth_frame
+import copy
 
 class Capture():
     def __init__(self,deviceManager, transformation):
@@ -13,13 +15,27 @@ class Capture():
         self.processedFrames = {}
 
     def capture(self):
+        #filter = rs.spatial_filter()
+        i=1
         while True:
             try:
+                savedData = {}
                 timeStamp = str(time.time())
-                #for (serial, [poseMat, rmsdValue]) in self.transformation.items(): 
                 timeFrame = self.deviceManager.poll_frames()
-                self.frames[timeStamp] = timeFrame
+                for device,frames in timeFrame.items():
+                    deviceData = {}
+                    for frame in frames:
+                        frameData = np.asanyarray(timeFrame[device][frame].get_data())
+                        deviceData[frame]=frameData
+                    savedData[device] = deviceData
+                    
+                #timeFrame['822512060553'][rs.stream.depth] = post_process_depth_frame(timeFrame['822512060553'][rs.stream.depth],temporal_smooth_alpha=0.1,temporal_smooth_delta=80)
+                #timeFrame['823112060874'][rs.stream.depth] = post_process_depth_frame(timeFrame['823112060874'][rs.stream.depth],temporal_smooth_alpha=0.1,temporal_smooth_delta=80)
+ 
+                self.frames[timeStamp] = copy.deepcopy(savedData)
+
                 print(timeFrame['822512060553'][rs.stream.depth].get_frame_number())
+
             except:
                 pass
 
@@ -34,12 +50,16 @@ if __name__=="__main__":
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_devices(enable_ir_emitter=True)
-    i = 0
     """
+    i = 0
+    data = {}
     while True:
         try:
+            timestamp = time.time()
             frames = deviceManager.poll_frames()
             print(frames['822512060553'][rs.stream.depth].get_frame_number())
+            frames['822512060553'].keep()
+            data[timestamp]=frames
         except:
             continue
         #print(i)
