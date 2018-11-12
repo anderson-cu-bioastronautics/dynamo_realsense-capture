@@ -6,6 +6,12 @@ from helperfunctions.realsense_device_manager import DeviceManager
 import time
 from helperfunctions.realsense_device_manager import post_process_depth_frame
 import copy
+import threading
+import sys
+import multiprocessing 
+import pickle
+import queue
+
 
 class Capture():
     def __init__(self,deviceManager, transformation):
@@ -13,11 +19,15 @@ class Capture():
         self.deviceManager = deviceManager
         self.frames = {}
         self.processedFrames = {}
+        #t1 = threading.Thread(target=self.capture())
+        #t2 = threading.Thread(target=self.process())
+        #t1.start()
+        #print('start')
 
     def capture(self):
-        #filter = rs.spatial_filter()
-        i=1
-        while True:
+        i=0
+        file = open('dataStore', 'wb')
+        while i<100:
             try:
                 savedData = {}
                 timeStamp = str(time.time())
@@ -26,18 +36,42 @@ class Capture():
                     deviceData = {}
                     for frame in frames:
                         frameData = np.asanyarray(timeFrame[device][frame].get_data())
-                        deviceData[frame]=frameData
+                        deviceData[frame]=copy.deepcopy(frameData)
                     savedData[device] = deviceData
                     
                 #timeFrame['822512060553'][rs.stream.depth] = post_process_depth_frame(timeFrame['822512060553'][rs.stream.depth],temporal_smooth_alpha=0.1,temporal_smooth_delta=80)
                 #timeFrame['823112060874'][rs.stream.depth] = post_process_depth_frame(timeFrame['823112060874'][rs.stream.depth],temporal_smooth_alpha=0.1,temporal_smooth_delta=80)
  
-                self.frames[timeStamp] = copy.deepcopy(savedData)
-
-                print(timeFrame['822512060553'][rs.stream.depth].get_frame_number())
+                #stframes[timeStamp] = copy.deepcopy(savedData)
+                #self.frames[timeStamp] = savedData
+                pickle.dump(copy.deepcopy(savedData),file)
+                i+=1
+                print(timeFrame['822512060853'][rs.stream.depth].get_frame_number())
+                #print(len(frames.items()))
 
             except:
                 pass
+        file.close()
+
+    def process(self):
+        print('started')
+        while True:
+            try:
+                for key,frame in self.frames.items():
+                    value = self.frames.pop(key)
+                    print(value)
+            except:
+                pass
+
+    def loadData(self,filename):
+        file = open(filename, 'rb')
+        dataRead = []
+        while 1:
+            try:
+                dataRead.append(pickle.load(file)) #this loads each frame in one at a time, this is where we can process each frame with the transformation matrix
+            except EOFError:
+                break
+
 
 if __name__=="__main__":
     rsConfig = rs.config()
@@ -65,5 +99,48 @@ if __name__=="__main__":
         #print(i)
         i+=1
     """
-    cap = Capture(deviceManager, [])
-    cap.capture()
+    #cap = Capture(deviceManager, [])
+    #time.sleep(2)
+    #t2.start()
+    print('yay')
+    #cap.capture()
+
+    def captureThread(q,deviceManager):
+        i=0
+        while i<1000:
+            savedData={}
+            timeStamp = str(time.time())
+            timeFrame = deviceManager.poll_frames()
+            for device,frames in timeFrame.items():
+                devices={}
+                deviceData = {}
+                for frame in frames:
+                    frameData = np.asanyarray(timeFrame[device][frame].get_data())
+                    deviceData[frame]=copy.deepcopy(frameData)
+                devices[device] = deviceData
+            savedData[timeStamp]=devices
+            q.put(copy.deepcopy(savedData))
+            i+=1
+            print(timeFrame['822512060853'][rs.stream.depth].get_frame_number())
+
+
+    def processThread(q):
+        file = open('dataStore','wb')
+
+        while not q.empty():
+            item = q.get()
+            pickle.dump(copy.deepcopy(item),file)
+            print('processed')
+            q.task_done()
+        print('queue finished')
+        file.close()
+
+    q = queue.Queue(maxsize=0)
+    worker1 = threading.Thread(target=captureThread,args=(q,deviceManager))
+    worker2 = threading.Thread(target=processThread,args=(q,))
+    
+    worker2.start()
+    worker1.start()
+    q.join()
+    #cap.process()
+    #cap.capture()
