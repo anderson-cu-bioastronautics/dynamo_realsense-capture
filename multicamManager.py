@@ -119,10 +119,11 @@ class AlignedData():
         points_ = np.vstack((points, np.ones((1,n))))
         points_trans_ = np.matmul(poseMat, points_)
         points_transformed = np.true_divide(points_trans_[:3,:], points_trans_[[-1], :])
-        return points_transformed.T
+        return np.array(points_transformed.T)
 
     
     def stream(self):
+        pointsAll = np.empty([0,3])
         for (serial, [poseMat, rotationMatrix, translationVector, rmsdValue]) in self.devicesTransformation.items():
             cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
             frames = self.deviceManager.poll_frames()[serial]
@@ -130,20 +131,22 @@ class AlignedData():
             colorFrame = frames[rs.stream.color]
 
             points = self.depthFrametoPC(depthFrame, self.devicesIntrinsics[serial][rs.stream.depth], poseMat, rotationMatrix, translationVector)
+            pointsAll = np.vstack((pointsAll,points))
             #print("wait")
-            dt = [("x", 'f4'), ("y", 'f4'), ("z", 'f4')]
-            verts = np.array(list(zip(*points.T)), dtype=dt)
-            el = PlyElement.describe(verts, 'vertex')
-            PlyData([el]).write(serial+"_DP2PC.ply")
+        dt = [("x", 'f4'), ("y", 'f4'), ("z", 'f4')]
+        verts = np.array(list(zip(*pointsAll.T)), dtype=dt)
+        el = PlyElement.describe(verts, 'vertex')
+        PlyData([el]).write("all_DP2PC.ply")
 
-            
-            #Using RS export to PLY
-            pc = rs.pointcloud()
-            pc.map_to(colorFrame)
-            points = rs.points()
-            points = pc.calculate(depthFrame)
-            vertices = np.array(np.asanyarray(points.get_vertices()).tolist())
-            points.export_to_ply(serial+"_RSPC.ply",colorFrame)
+        """
+        #Using RS export to PLY
+        pc = rs.pointcloud()
+        pc.map_to(colorFrame)
+        points = rs.points()
+        points = pc.calculate(depthFrame)
+        vertices = np.array(np.asanyarray(points.get_vertices()).tolist())
+        points.export_to_ply(serial+"_RSPC.ply",colorFrame)
+        """
 
             
 
@@ -155,13 +158,14 @@ if __name__=="__main__":
     rsConfig = rs.config()
     resolutionWidth = 848
     resolutionHeight = 480
-    frameRate = 90
-    #rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
-    #rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.rgb8, frameRate)
-    #rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
+    frameRate = 30
+    rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
+    rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
+    rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_devices(enable_ir_emitter=True)
+    deviceManager.load_settings_json('DisparityShift.json')
     deviceCalibration = Calibrate(deviceManager)
     transformation = deviceCalibration.devicesTransformation
     intrinsics = deviceCalibration.devicesIntrinsics
