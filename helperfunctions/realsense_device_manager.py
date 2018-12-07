@@ -195,7 +195,7 @@ class DeviceManager:
             advanced_mode = rs.rs400_advanced_mode(device)
             advanced_mode.load_json(json_text)
 
-    def poll_frames(self):
+    def poll_frames(self, **kwargs):
         """
         Poll for frames from the enabled Intel RealSense devices.
         This function is modified to return frame objects which are of their inherent format from the pyrealsense2 libray.
@@ -207,17 +207,24 @@ class DeviceManager:
             pipeline = device.pipeline
             streams = device.pipeline_profile.get_streams()
             frames = pipeline.wait_for_frames()
-            for stream in streams:
-                if stream.stream_type() == rs.stream.infrared:
-                    key_ = (stream.stream_type(), stream.stream_index())
-                    frame = frames.get_infrared_frame(stream.stream_index())
-                elif stream.stream_type() == rs.stream.depth:
-                    key_ = stream.stream_type()
-                    frame = frames.get_depth_frame()
-                elif stream.stream_type() == rs.stream.color:
-                    key_ = stream.stream_type()
-                    frame = frames.get_color_frame()
-                frameCollection[serial][key_] = frame
+            if ('raw') in kwargs:
+                if kwargs['raw'] == True:
+                    frameCollection[serial] = frames
+                else:
+                    pass
+            else:
+                for stream in streams:
+                    if stream.stream_type() == rs.stream.infrared:
+                        key_ = (stream.stream_type(), stream.stream_index())
+                        frame = frames.get_infrared_frame(stream.stream_index())
+                    elif stream.stream_type() == rs.stream.depth:
+                        key_ = stream.stream_type()
+                        frame = frames.get_depth_frame()
+                    elif stream.stream_type() == rs.stream.color:
+                        key_ = stream.stream_type()
+                        frame = frames.get_color_frame()
+                    frameCollection[serial][key_] = frame
+                
         return frameCollection
 
                 

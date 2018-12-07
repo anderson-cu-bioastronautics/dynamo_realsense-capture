@@ -5,3 +5,4 @@ helperfunctions/__pycache__
 *.ply
 exampleRotationtranslatation.txt
 scratch.py
+*.pickle
