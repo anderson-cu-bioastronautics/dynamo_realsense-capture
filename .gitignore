@@ -7,3 +7,4 @@ exampleRotationtranslatation.txt
 scratch.py
 __pycache__
 *.pickle
+dataStore

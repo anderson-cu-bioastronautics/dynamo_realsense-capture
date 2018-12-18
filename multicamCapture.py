@@ -12,6 +12,10 @@ import multiprocessing
 import pickle
 import queue
 
+from pclpy import pcl
+import pcl
+import pcl.pcl_visualization
+
 
 class Capture():
     def __init__(self,deviceManager, transformation):
@@ -21,13 +25,13 @@ class Capture():
         self.processedFrames = {}
         #t1 = threading.Thread(target=self.capture())
         #t2 = threading.Thread(target=self.process())
-        #t1.start()
+        #1.start()
         #print('start')
-
+    
     def capture(self):
         i=0
         file = open('dataStore', 'wb')
-        while i<100:
+        while i<1000:
             try:
                 savedData = {}
                 timeStamp = str(time.time())
@@ -99,7 +103,7 @@ if __name__=="__main__":
         #print(i)
         i+=1
     """
-    #cap = Capture(deviceManager, [])
+    cap = Capture(deviceManager, [])
     #time.sleep(2)
     #t2.start()
     print('yay')
@@ -107,17 +111,24 @@ if __name__=="__main__":
 
     def captureThread(q,deviceManager):
         i=0
-        while i<1000:
+        alignTo = rs.stream.color
+        align = rs.align(alignTo)
+        while i<10000:
             savedData={}
             timeStamp = str(time.time())
-            timeFrame = deviceManager.poll_frames()
+            timeFrame = deviceManager.poll_frames(raw=True)
+            devices={}
             for device,frames in timeFrame.items():
-                devices={}
+                #devices={}
                 deviceData = {}
-                for frame in frames:
-                    frameData = np.asanyarray(timeFrame[device][frame].get_data())
-                    deviceData[frame]=copy.deepcopy(frameData)
-                devices[device] = deviceData
+                alignedFrames = align.process(frames)
+                deviceData[rs.stream.depth] = copy.deepcopy(np.asanyarray(alignedFrames.get_depth_frame().get_data()))
+                deviceData[rs.stream.color] = copy.deepcopy(np.asanyarray(alignedFrames.get_color_frame().get_data()))
+                #for frame in alignedFrames:
+                #    frameData = np.asanyarray(frame.get_data())
+                #    deviceData[frame]=copy.deepcopy(frameData)
+                devices[device] = copy.deepcopy(deviceData)
+            
             savedData[timeStamp]=devices
             q.put(copy.deepcopy(savedData))
             i+=1
@@ -130,6 +141,7 @@ if __name__=="__main__":
         while not q.empty():
             item = q.get()
             pickle.dump(copy.deepcopy(item),file)
+            time.sleep(1/300)
             print('processed')
             q.task_done()
         print('queue finished')
@@ -139,8 +151,8 @@ if __name__=="__main__":
     worker1 = threading.Thread(target=captureThread,args=(q,deviceManager))
     worker2 = threading.Thread(target=processThread,args=(q,))
     
-    worker2.start()
     worker1.start()
+    worker2.start()
     q.join()
     #cap.process()
     #cap.capture()
