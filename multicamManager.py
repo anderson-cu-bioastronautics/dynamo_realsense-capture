@@ -74,13 +74,13 @@ class Calibrate():
                 observedchessboardCentered = validobservedchessboardPoints - rmsd.centroid(validobservedchessboardPoints)
                 rotationMatrix = rmsd.kabsch(chessboardPointsCentered, observedchessboardCentered)
                 rmsdValue = rmsd.kabsch_rmsd(chessboardPointsCentered, observedchessboardCentered)
-                distancesVector = rmsd.centroid(validobservedchessboardPoints) - np.matmul(rmsd.centroid(validchessboardPoints), rotationMatrix)
-                translationVector = -np.matmul(np.transpose(rotationMatrix), np.transpose(distancesVector.flatten()))
-                
-                
+                #translationVector = rmsd.centroid(observedchessboardCentered) - np.matmul(rmsd.centroid(chessboardPointsCentered), rotationMatrix)
+                translationVector = rmsd.centroid(validobservedchessboardPoints) - np.matmul(rmsd.centroid(validchessboardPoints), rotationMatrix)
+                #rotationMatrix = rotationMatrix.transpose()
+                trans = -np.matmul(rotationMatrix, translationVector.transpose())
                 poseMat = np.zeros((4,4))
                 poseMat[:3,:3] = rotationMatrix
-                poseMat[:3,3] = translationVector
+                poseMat[:3,3] = trans.flatten()
                 poseMat[3,3] = 1
                 self.devicesTransformation[serial] = [poseMat, rmsdValue]
 
@@ -93,58 +93,91 @@ class AlignedData():
         self.stream()
         
 
-    def depthFrametoPC(self, depthFrame, cameraIntrinsics, poseMat):
+    def depthFrametoPC(self, depthFrame, colorFrame, cameraIntrinsics, poseMat):
         [height, width] = [depthFrame.get_height(), depthFrame.get_width()]
+        depth = np.asanyarray(depthFrame.get_data())
+        rgb = np.asanyarray(colorFrame.get_data())
+        
         nx = np.linspace(0, width-1, width)
         ny = np.linspace(0, height-1, height)
         u, v = np.meshgrid(nx, ny)
         x = (u.flatten() - cameraIntrinsics.ppx)/cameraIntrinsics.fx
         y = (v.flatten() - cameraIntrinsics.ppy)/cameraIntrinsics.fy
-        z = np.asanyarray(depthFrame.get_data()).flatten() / 1000
+        z = depth.flatten() / 1000
         x = np.multiply(x,z)
         y = np.multiply(y,z)
 
-        x = x[np.nonzero(z)]
-        y = y[np.nonzero(z)]
-        z = z[np.nonzero(z)]
+        #x = x[np.nonzero(z)]
+        #y = y[np.nonzero(z)]
+        #z = z[np.nonzero(z)]
+
+        rgbB = rgb[:,:,0].flatten().astype(float)
+        rgbG = rgb[:,:,1].flatten().astype(float)
+        rgbR = rgb[:,:,2].flatten().astype(float)
 
         points = np.asanyarray([x,y,z])
-
-        #rot = np.transpose(rotationMatrix)
-        #trans = -np.matmul(np.transpose(rotationMatrix), translationVector)
-        #poseMat[:3,:3] = rot
-        #poseMat[:3,3] = trans
-        #poseMat[3,3] = 1
 
         n = points.shape[1] 
         points_ = np.vstack((points, np.ones((1,n))))
         points_trans_ = np.matmul(poseMat, points_)
         points_transformed = np.true_divide(points_trans_[:3,:], points_trans_[[-1], :])
-        return points_transformed.T
+
+        allPoints = np.asanyarray([points_transformed[0,:],points_transformed[1,:],points_transformed[2,:],rgbR, rgbG, rgbB]).T
+        strPoints = []
+        for point in allPoints:
+            if point[2]!=0:
+                strPoints.append("%f %f %f %d %d %d 0\n"%(point[0], point[1], point[2], point[3], point[4], point[5]))
+        # = points_transformed[]
+        return strPoints
 
     
     def stream(self):
+        pointsAll = []
+        alignTo = rs.stream.color
+        align = rs.align(alignTo)
+        framesAll = self.deviceManager.poll_frames(raw=True)
         for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
             cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
-            frames = self.deviceManager.poll_frames()[serial]
-            depthFrame = frames[rs.stream.depth]
-            colorFrame = frames[rs.stream.color]
+            frames = framesAll[serial]
+            alignedFrames = align.process(frames)
+            #depthFrame = frames[rs.stream.depth]
+            #colorFrame = frames[rs.stream.color]
+            depthFrame = alignedFrames.get_depth_frame()
+            colorFrame = alignedFrames.get_color_frame()
 
-            points = self.depthFrametoPC(depthFrame, self.devicesIntrinsics[serial][rs.stream.depth], poseMat)
+            points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
+            #points2 = self.generate_pointcloud(colorFrame, depthFrame, self.devicesIntrinsics, poseMat)
+            pointsAll = pointsAll+points
             #print("wait")
-            dt = [("x", 'f4'), ("y", 'f4'), ("z", 'f4')]
-            verts = np.array(list(zip(*points.T)), dtype=dt)
-            el = PlyElement.describe(verts, 'vertex')
-            PlyData([el]).write(serial+"_DP2PC.ply")
+        file = open('finaltest.ply',"w")
+        file.write('''ply
+        format ascii 1.0
+        element vertex %d
+        property float x
+        property float y
+        property float z
+        property uchar red
+        property uchar green
+        property uchar blue
+        property uchar alpha
+        end_header
+        %s
+        '''%(len(pointsAll),"".join(pointsAll)))
+        file.close()
+        ##dt = [("x", 'f4'), ("y", 'f4'), ("z", 'f4')]
+        ##verts = np.array(list(zip(*pointsAll.T)), dtype=dt)
+        ##el = PlyElement.describe(verts, 'vertex')
+        ##PlyData([el]).write("all_DP2PC.ply")
 
-            
-            #Using RS export to PLY
-            pc = rs.pointcloud()
-            pc.map_to(colorFrame)
-            points = rs.points()
-            points = pc.calculate(depthFrame)
-            vertices = np.array(np.asanyarray(points.get_vertices()).tolist())
-            points.export_to_ply(serial+"_RSPC.ply",colorFrame)
+        """
+        #Using RS export to PLY
+        pc = rs.pointcloud()
+        pc.map_to(colorFrame)
+        points = rs.points()
+        points = pc.calculate(depthFrame)
+        vertices = np.array(np.asanyarray(points.get_vertices()).tolist())
+        points.export_to_ply(serial+"_RSPC.ply",colorFrame)
+        """
 
             
 
@@ -163,6 +196,7 @@ if __name__=="__main__":
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_devices(enable_ir_emitter=True)
+    deviceManager.load_settings_json('DisparityShift.json')
     deviceCalibration = Calibrate(deviceManager)
     transformation = deviceCalibration.devicesTransformation
     intrinsics = deviceCalibration.devicesIntrinsics
