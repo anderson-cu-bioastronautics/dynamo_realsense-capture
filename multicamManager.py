@@ -6,6 +6,18 @@ from helperfunctions.realsense_device_manager import DeviceManager
 import helperfunctions.calculate_rmsd_kabsch as rmsd
 from plyfile import PlyData, PlyElement
 
+import copy
+import threading
+import sys
+import multiprocessing 
+import pickle
+import queue
+
+from pclpy import pcl
+import pcl
+import pcl.pcl_visualization
+
+
 class Calibrate():
 
     def __init__(self, device_manager):
@@ -111,9 +123,10 @@ class AlignedData():
         #y = y[np.nonzero(z)]
         #z = z[np.nonzero(z)]
 
-        rgbB = rgb[:,:,0].flatten().astype(float)
-        rgbG = rgb[:,:,1].flatten().astype(float)
-        rgbR = rgb[:,:,2].flatten().astype(float)
+        rgbB = rgb[:,:,0].flatten().astype(int)
+        rgbG = rgb[:,:,1].flatten().astype(int)
+        rgbR = rgb[:,:,2].flatten().astype(int)
+        rgbPC = rgbR<<16|rgbG<<8|rgbB
 
         points = np.asanyarray([x,y,z])
 
@@ -122,15 +135,92 @@ class AlignedData():
         points_trans_ = np.matmul(poseMat, points_)
         points_transformed = np.true_divide(points_trans_[:3,:], points_trans_[[-1], :])
 
-        allPoints = np.asanyarray([points_transformed[0,:],points_transformed[1,:],points_transformed[2,:],rgbR, rgbG, rgbB]).T
-        strPoints = []
-        for point in allPoints:
-            if point[2]!=0:
-                strPoints.append("%f %f %f %d %d %d 0\n"%(point[0], point[1], point[2], point[3], point[4], point[5]))
-        # = points_transformed[]
-        return strPoints
+        allPoints = np.asanyarray([points_transformed[0,:],points_transformed[1,:],points_transformed[2,:],rgbPC]).T
+        return allPoints
 
-    
+
+    def captureThread(self,q,deviceManager):
+        i=0
+        alignTo = rs.stream.color
+        align = rs.align(alignTo)
+        while i<500:
+            #cloud = pcl.PointCloud_PointXYZRGBA()
+            savedData={}
+            timeStamp = str(time.time())
+            framesAll = deviceManager.poll_frames(raw=True)
+            #allPoints= np.empty((0,4))
+            for device,frames in framesAll.items():
+                deviceData = {}
+                #cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
+                #frames = framesAll[serial]
+                align = rs.align(alignTo)
+                alignedFrames = align.process(frames)
+                #depthFrame = frames[rs.stream.depth]
+                #colorFrame = frames[rs.stream.color]
+                depthFrame = alignedFrames.get_depth_frame()
+                colorFrame = alignedFrames.get_color_frame()
+                deviceData[rs.stream.depth] = depthFrame
+                deviceData[rs.stream.color] = colorFrame
+                savedData[device]=deviceData
+                #points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
+                #points2 = self.generate_pointcloud(colorFrame, depthFrame, self.devicesIntrinsics, poseMat)
+                #allPoints = np.append(allPoints, points,axis=0)
+            
+            """
+            for device,frames in timeFrame.items():
+                #devices={}
+                deviceData = {}
+                alignedFrames = align.process(frames)
+                deviceData[rs.stream.depth] = copy.deepcopy(np.asanyarray(alignedFrames.get_depth_frame().get_data()))
+                deviceData[rs.stream.color] = copy.deepcopy(np.asanyarray(alignedFrames.get_color_frame().get_data()))
+                #for frame in alignedFrames:
+                #    frameData = np.asanyarray(frame.get_data())
+                #    deviceData[frame]=copy.deepcopy(frameData)
+                devices[device] = copy.deepcopy(deviceData)
+            """
+            #cloud.from_array(allPoints.astype('float32'))
+            #savedData[timeStamp]=cloud
+            q.put(savedData)
+            i+=1
+            print(str(i)+':' + str(framesAll['822512060853'][rs.stream.depth].get_frame_number()))
+
+
+    def processThread(self,q):
+        file = open('dataStore','wb')
+
+        while not q.empty():
+            item = q.get()
+            cloud = pcl.PointCloud_PointXYZRGBA()
+            allPoints= np.empty((0,4))
+            for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
+                cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
+                frames = item[serial]
+                #alignedFrames = align.process(frames)
+                #depthFrame = frames[rs.stream.depth]
+                #colorFrame = frames[rs.stream.color]
+                depthFrame = frames[rs.stream.depth]
+                colorFrame = frames[rs.stream.color]
+                points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
+                allPoints = np.append(allPoints, points,axis=0)
+            cloud.from_array(allPoints.astype('float32'))
+            pickle.dump(copy.deepcopy(cloud),file)
+            #time.sleep(1/30)
+            print('processed')
+            q.task_done()
+        print('queue finished')
+        file.close()
+
+    def stream(self):
+        q = queue.Queue(maxsize=0)
+        worker1 = threading.Thread(target=self.captureThread,args=(q,deviceManager))
+        worker2 = threading.Thread(target=self.processThread,args=(q,))
+
+        worker1.start()
+        #time.sleep(5)
+        worker2.start()
+        q.join()
+        
+    """
     def stream(self):
         pointsAll = []
         alignTo = rs.stream.color
@@ -168,8 +258,8 @@ class AlignedData():
         ##verts = np.array(list(zip(*pointsAll.T)), dtype=dt)
         ##el = PlyElement.describe(verts, 'vertex')
         ##PlyData([el]).write("all_DP2PC.ply")
-
-        """
+    """
+    """
         #Using RS export to PLY
         pc = rs.pointcloud()
         pc.map_to(colorFrame)
@@ -177,7 +267,7 @@ class AlignedData():
         points = pc.calculate(depthFrame)
         vertices = np.array(np.asanyarray(points.get_vertices()).tolist())
         points.export_to_ply(serial+"_RSPC.ply",colorFrame)
-        """
+    """
 
             
 
@@ -189,7 +279,7 @@ if __name__=="__main__":
     rsConfig = rs.config()
     resolutionWidth = 848
     resolutionHeight = 480
-    frameRate = 30
+    frameRate = 60
     rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
     rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
     rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
