@@ -17,6 +17,7 @@ from pclpy import pcl
 import pcl
 import pcl.pcl_visualization
 
+from multiprocessing import Process,Queue
 
 class Calibrate():
 
@@ -105,11 +106,13 @@ class AlignedData():
         self.stream()
         
 
-    def depthFrametoPC(self, depthFrame, colorFrame, cameraIntrinsics, poseMat):
-        [height, width] = [depthFrame.get_height(), depthFrame.get_width()]
-        depth = np.asanyarray(depthFrame.get_data())
-        rgb = np.asanyarray(colorFrame.get_data())
-        
+    def depthFrametoPC(self, depth, rgb, cameraIntrinsics, poseMat):
+        starttime = time.time()
+        [height,width] = np.array(depth.shape)
+        #[height, width] = [depthFrame.get_height(), depthFrame.get_width()]
+        #depth = np.asanyarray(depthFrame.get_data())
+        #rgb = np.asanyarray(colorFrame.get_data())
+        time1 = time.time()
         nx = np.linspace(0, width-1, width)
         ny = np.linspace(0, height-1, height)
         u, v = np.meshgrid(nx, ny)
@@ -118,7 +121,7 @@ class AlignedData():
         z = depth.flatten() / 1000
         x = np.multiply(x,z)
         y = np.multiply(y,z)
-
+        time2 = time.time()
         #x = x[np.nonzero(z)]
         #y = y[np.nonzero(z)]
         #z = z[np.nonzero(z)]
@@ -127,22 +130,22 @@ class AlignedData():
         rgbG = rgb[:,:,1].flatten().astype(int)
         rgbR = rgb[:,:,2].flatten().astype(int)
         rgbPC = rgbR<<16|rgbG<<8|rgbB
-
+        time3=time.time()
         points = np.asanyarray([x,y,z])
 
         n = points.shape[1] 
         points_ = np.vstack((points, np.ones((1,n))))
         points_trans_ = np.matmul(poseMat, points_)
         points_transformed = np.true_divide(points_trans_[:3,:], points_trans_[[-1], :])
-
+        time4=time.time()
         allPoints = np.asanyarray([points_transformed[0,:],points_transformed[1,:],points_transformed[2,:],rgbPC]).T
+        times = np.array([time1,time2,time3,time4])-starttime
+        print(times)
         return allPoints
 
 
     def captureThread(self,q,deviceManager):
         i=0
-        alignTo = rs.stream.color
-        align = rs.align(alignTo)
         while i<500:
             #cloud = pcl.PointCloud_PointXYZRGBA()
             savedData={}
@@ -153,14 +156,14 @@ class AlignedData():
                 deviceData = {}
                 #cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
                 #frames = framesAll[serial]
-                align = rs.align(alignTo)
+                align = rs.align(rs.stream.color)
                 alignedFrames = align.process(frames)
                 #depthFrame = frames[rs.stream.depth]
                 #colorFrame = frames[rs.stream.color]
-                depthFrame = alignedFrames.get_depth_frame()
-                colorFrame = alignedFrames.get_color_frame()
-                deviceData[rs.stream.depth] = depthFrame
-                deviceData[rs.stream.color] = colorFrame
+                #depthFrame = frames.get_depth_frame()
+                #colorFrame = frames.get_color_frame()
+                deviceData['depth'] = np.asanyarray(alignedFrames.get_depth_frame().get_data())
+                deviceData['color'] = np.asanyarray(alignedFrames.get_color_frame().get_data())
                 savedData[device]=deviceData
                 #points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
                 #points2 = self.generate_pointcloud(colorFrame, depthFrame, self.devicesIntrinsics, poseMat)
@@ -182,28 +185,29 @@ class AlignedData():
             #savedData[timeStamp]=cloud
             q.put(savedData)
             i+=1
-            print(str(i)+':' + str(framesAll['822512060853'][rs.stream.depth].get_frame_number()))
+            #print(str(i)+':' + str(framesAll['822512060522'][rs.stream.depth].get_frame_number()))
 
 
     def processThread(self,q):
         file = open('dataStore','wb')
-
+        align = rs.align(rs.stream.color)
         while not q.empty():
             item = q.get()
             cloud = pcl.PointCloud_PointXYZRGBA()
-            allPoints= np.empty((0,4))
+            allPoints= {}
             for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
                 cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
                 frames = item[serial]
                 #alignedFrames = align.process(frames)
-                #depthFrame = frames[rs.stream.depth]
-                #colorFrame = frames[rs.stream.color]
-                depthFrame = frames[rs.stream.depth]
-                colorFrame = frames[rs.stream.color]
+                depthFrame = frames['depth']
+                colorFrame = frames['color']
+                #depthFrame = alignedFrames.get_depth_frame()
+                #colorFrame = alignedFrames.get_color_frame()
+                
                 points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
-                allPoints = np.append(allPoints, points,axis=0)
-            cloud.from_array(allPoints.astype('float32'))
-            pickle.dump(copy.deepcopy(cloud),file)
+                allPoints[serial] = points
+            #cloud.from_array(allPoints.astype('float32'))
+            pickle.dump(copy.deepcopy(allPoints),file)
             #time.sleep(1/30)
             print('processed')
             q.task_done()
@@ -214,10 +218,11 @@ class AlignedData():
         q = queue.Queue(maxsize=0)
         worker1 = threading.Thread(target=self.captureThread,args=(q,deviceManager))
         worker2 = threading.Thread(target=self.processThread,args=(q,))
-
+        #worker2 = Process(target=self.processThread,args=(q,))
         worker1.start()
-        #time.sleep(5)
+        #time.sleep()
         worker2.start()
+        #worker2.join()
         q.join()
         
     """
