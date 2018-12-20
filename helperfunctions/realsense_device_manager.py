@@ -177,7 +177,7 @@ class DeviceManager:
             sensor = device.pipeline_profile.get_device().first_depth_sensor()
             sensor.set_option(rs.option.emitter_enabled, 1 if enable_ir_emitter else 0)
             if enable_ir_emitter:
-                sensor.set_option(rs.option.laser_power, 330)
+                sensor.set_option(rs.option.laser_power, 500)
 
     def load_settings_json(self, path_to_settings_file):
         """
@@ -207,6 +207,7 @@ class DeviceManager:
             pipeline = device.pipeline
             streams = device.pipeline_profile.get_streams()
             frames = pipeline.wait_for_frames()
+            frames.keep()
             if ('raw') in kwargs:
                 if kwargs['raw'] == True:
                     frameCollection[serial] = frames

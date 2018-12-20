@@ -24,7 +24,7 @@ class Calibrate():
     def __init__(self, device_manager,load,new):
         self.deviceManager = device_manager  
         #for frame in range(30): #disposes 30 frames to stabilize autoexposure
-        time.sleep(5) #allow for auto-exposure to stabilize and frames to start coming in 
+        time.sleep(1) #allow for auto-exposure to stabilize and frames to start coming in 
         frames = self.deviceManager.poll_frames()
         self.devicesIntrinsics = self.deviceManager.get_device_intrinsics(frames)
         if load:
@@ -107,10 +107,11 @@ class Calibrate():
 
     
 class AlignedData():
-    def __init__(self, devicesTransformation, devicesIntrisics, deviceManager):
+    def __init__(self, devicesTransformation, devicesIntrisics, deviceManager,fileName):
         self.devicesTransformation = devicesTransformation
         self.deviceManager = deviceManager
         self.devicesIntrinsics = devicesIntrisics
+        self.fileName = fileName
         self.stream()
         
 
@@ -120,7 +121,7 @@ class AlignedData():
         #[height, width] = [depthFrame.get_height(), depthFrame.get_width()]
         #depth = np.asanyarray(depthFrame.get_data())
         #rgb = np.asanyarray(colorFrame.get_data())
-        time1 = time.time()
+        ##time1 = time.time()
         nx = np.linspace(0, width-1, width)
         ny = np.linspace(0, height-1, height)
         u, v = np.meshgrid(nx, ny)
@@ -129,7 +130,7 @@ class AlignedData():
         z = depth.flatten() / 1000
         x = np.multiply(x,z)
         y = np.multiply(y,z)
-        time2 = time.time()
+        ##time2 = time.time()
         #x = x[np.nonzero(z)]
         #y = y[np.nonzero(z)]
         #z = z[np.nonzero(z)]
@@ -138,23 +139,23 @@ class AlignedData():
         rgbG = rgb[:,:,1].flatten().astype(int)
         rgbR = rgb[:,:,2].flatten().astype(int)
         rgbPC = rgbR<<16|rgbG<<8|rgbB
-        time3=time.time()
+        ##time3=time.time()
         points = np.asanyarray([x,y,z])
 
         n = points.shape[1] 
         points_ = np.vstack((points, np.ones((1,n))))
         points_trans_ = np.matmul(poseMat, points_)
         points_transformed = np.true_divide(points_trans_[:3,:], points_trans_[[-1], :])
-        time4=time.time()
+        ##time4=time.time()
         allPoints = np.asanyarray([points_transformed[0,:],points_transformed[1,:],points_transformed[2,:],rgbPC]).T
-        times = np.array([time1,time2,time3,time4])-starttime
-        print(times)
+        ##times = np.array([time1,time2,time3,time4])-starttime
+        ##print(times)
         return allPoints
 
 
     def captureThread(self,q,deviceManager):
         i=0
-        while i<500:
+        while i<150:
             #cloud = pcl.PointCloud_PointXYZRGBA()
             savedData={}
             timeStamp = str(time.time())
@@ -170,9 +171,10 @@ class AlignedData():
                 #colorFrame = frames[rs.stream.color]
                 #depthFrame = frames.get_depth_frame()
                 #colorFrame = frames.get_color_frame()
-                deviceData['depth'] = np.asanyarray(alignedFrames.get_depth_frame().get_data())
-                deviceData['color'] = np.asanyarray(alignedFrames.get_color_frame().get_data())
+                deviceData['depth'] = copy.deepcopy(np.asanyarray(alignedFrames.get_depth_frame().get_data()))
+                deviceData['color'] = copy.deepcopy(np.asanyarray(alignedFrames.get_color_frame().get_data()))
                 savedData[device]=deviceData
+                #print(str(i)+':'+str(frames.get_frame_number()))
                 #points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
                 #points2 = self.generate_pointcloud(colorFrame, depthFrame, self.devicesIntrinsics, poseMat)
                 #allPoints = np.append(allPoints, points,axis=0)
@@ -193,12 +195,13 @@ class AlignedData():
             #savedData[timeStamp]=cloud
             q.put(savedData)
             i+=1
-            #print(str(i)+':' + str(framesAll['822512060522'][rs.stream.depth].get_frame_number()))
+            print(str(i)+':' + str(framesAll['822512060522'].get_frame_number()))
 
 
-    def processThread(self,q):
-        file = open('dataStore','wb')
+    def processThread(self,q,fileName):
+        file = open('dataStore'+str(fileName),'wb')
         align = rs.align(rs.stream.color)
+        i=1
         while not q.empty():
             item = q.get()
             cloud = pcl.PointCloud_PointXYZRGBA()
@@ -217,20 +220,21 @@ class AlignedData():
             #cloud.from_array(allPoints.astype('float32'))
             pickle.dump(copy.deepcopy(allPoints),file)
             #time.sleep(1/30)
-            print('processed')
+            print('processed'+str(i))
             q.task_done()
+            i+=1
         print('queue finished')
         file.close()
 
     def stream(self):
         q = queue.Queue(maxsize=0)
         worker1 = threading.Thread(target=self.captureThread,args=(q,deviceManager))
-        worker2 = threading.Thread(target=self.processThread,args=(q,))
+        worker2 = threading.Thread(target=self.processThread,args=(q,self.fileName))
         #worker2 = Process(target=self.processThread,args=(q,))
         worker1.start()
-        #time.sleep()
+        time.sleep(1)
         worker2.start()
-        #worker2.join()
+        worker2.join()
         q.join()
         
     """
@@ -293,12 +297,12 @@ if __name__=="__main__":
     parser.add_argument("--load", help="load calibration",
                         nargs='?')
     parser.add_argument("--new", help="new calibration",
-                        nargs='?')
+                        nargs='?',default='new')
     args = parser.parse_args()
     rsConfig = rs.config()
     resolutionWidth = 848
     resolutionHeight = 480
-    frameRate = 60
+    frameRate = 30
     rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
     rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
     rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
@@ -310,8 +314,11 @@ if __name__=="__main__":
     transformation = deviceCalibration.devicesTransformation
     intrinsics = deviceCalibration.devicesIntrinsics
     input("Calibration complete, press Enter to continue...")
-    data = AlignedData(transformation, intrinsics, deviceManager)
-
+    fname = 1
+    while True:
+        data = AlignedData(transformation, intrinsics, deviceManager,fname)
+        input("Data Collection complete, press Enter to continue...")
+        fname+=1
 
 
 
