@@ -17,27 +17,35 @@ from pclpy import pcl
 import pcl
 import pcl.pcl_visualization
 
-from multiprocessing import Process,Queue
+import argparse
 
 class Calibrate():
 
-    def __init__(self, device_manager):
+    def __init__(self, device_manager,load,new):
         self.deviceManager = device_manager  
         #for frame in range(30): #disposes 30 frames to stabilize autoexposure
         time.sleep(5) #allow for auto-exposure to stabilize and frames to start coming in 
         frames = self.deviceManager.poll_frames()
         self.devicesIntrinsics = self.deviceManager.get_device_intrinsics(frames)
-        self.devicesChessboardLocations = {}
-        self.devicesTransformation = {}
-        
-        #Define Calibration Target
-        self.chessboardHeight = 6 #squares
-        self.chessboardWidth = 9 #squares
-        self.chessboardSquareSize = 0.0253 #m
-        
-        #Perform Calibration steps
-        self.detectChessboard()
-        self.poseTransformation()
+        if load:
+            file = open(load,'rb')
+            self.devicesTransformation = pickle.load(file)
+        elif new:
+            file = open(new+'.cal','wb')
+            self.devicesChessboardLocations = {}
+            self.devicesTransformation = {}
+            
+            #Define Calibration Target
+            self.chessboardHeight = 6 #squares
+            self.chessboardWidth = 9 #squares
+            self.chessboardSquareSize = 0.0253 #m
+            
+            #Perform Calibration steps
+            self.detectChessboard()
+            self.poseTransformation()
+            pickle.dump(self.devicesTransformation, file)
+            file.close()
+
         #return self.devicesTransformation
 
 
@@ -281,6 +289,12 @@ class AlignedData():
 
 
 if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--load", help="load calibration",
+                        nargs='?')
+    parser.add_argument("--new", help="new calibration",
+                        nargs='?')
+    args = parser.parse_args()
     rsConfig = rs.config()
     resolutionWidth = 848
     resolutionHeight = 480
@@ -292,7 +306,7 @@ if __name__=="__main__":
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_devices(enable_ir_emitter=True)
     deviceManager.load_settings_json('DisparityShift.json')
-    deviceCalibration = Calibrate(deviceManager)
+    deviceCalibration = Calibrate(deviceManager,args.load,args.new)
     transformation = deviceCalibration.devicesTransformation
     intrinsics = deviceCalibration.devicesIntrinsics
     input("Calibration complete, press Enter to continue...")
