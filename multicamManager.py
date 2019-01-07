@@ -41,6 +41,7 @@ class Calibrate():
             self.chessboardSquareSize = 0.0253 #m
             
             #Perform Calibration steps
+            time.sleep(1)
             self.detectChessboard()
             self.poseTransformation()
             pickle.dump(self.devicesTransformation, file)
@@ -52,17 +53,23 @@ class Calibrate():
     def detectChessboard(self):
         chessboardDeviceCount = 0
         while chessboardDeviceCount < len(self.deviceManager._available_devices):
-            cameraFrames = self.deviceManager.poll_frames()
-            for device in cameraFrames.keys(): #this will iterate through each device's serial number (which are used as keys in the frames object)
-                singleCameraFrame = cameraFrames[device]
-                infraredImage = np.asanyarray(singleCameraFrame[rs.stream.infrared,1].get_data())
-                depthFrame = singleCameraFrame[rs.stream.depth]
+            cameraFrames = self.deviceManager.poll_frames(raw=True)
+            for device, frames in cameraFrames.items(): #this will iterate through each device's serial number (which are used as keys in the frames object)
+                align = rs.align(rs.stream.color)
+                alignedFrames = align.process(frames)
+                colorImage = np.asanyarray(alignedFrames.get_color_frame().get_data())
+                bwImage = cv2.cvtColor(colorImage,cv2.COLOR_BGR2GRAY)
+                depthFrame = alignedFrames.get_depth_frame()
                 depthIntrinsics = self.devicesIntrinsics[device][rs.stream.depth]                
                 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-                chessboardFound, corners = cv2.findChessboardCorners(infraredImage, (self.chessboardWidth, self.chessboardHeight))
+                chessboardFound, corners = cv2.findChessboardCorners(bwImage, (self.chessboardWidth, self.chessboardHeight))
                 if chessboardFound:
+                    
                     print(device," sees the chessboard!")
-                    points2D = cv2.cornerSubPix(infraredImage, corners, (11,11), (-1,-1), criteria)
+                    points2D = cv2.cornerSubPix(bwImage, corners, (11,11), (-1,-1), criteria)
+                    #cv2.drawChessboardCorners(infraredImage, (self.chessboardWidth, self.chessboardHeight), points2D, chessboardFound)
+                    #cv2.imshow(device,infraredImage)
+                    #cv2.waitKey(0)
                     points2D = np.transpose(corners, (2,0,1))
                     points3D = np.zeros((3, len(points2D[0])))
                     validPoints = [False] * len(points2D[0])
@@ -77,6 +84,8 @@ class Calibrate():
                     self.devicesChessboardLocations[device] = corners, points2D, points3D, validPoints
                     chessboardDeviceCount += 1
                 if not chessboardFound:
+                    #cv2.imshow(device,infraredImage)
+                    #cv2.waitKey(0)
                     print(device," cannot detect the chessboard!")
 
 
@@ -203,12 +212,16 @@ class AlignedData():
     def processThread(self,q,fileName):
         file = open('dataStore'+str(fileName),'wb')
         align = rs.align(rs.stream.color)
+        temporalFilter = rs.temporal_filter()
+        temporalFilter.set_option(rs.option.filter_smooth_alpha, 0.26)
+        temporalFilter.set_option(rs.option.filter_smooth_delta, 20)
         
         i=1
         while not q.empty():
             framesAll = q.get()
             savedData={}
             for device,frames in framesAll.items():
+                
                 deviceData = {}
                 #cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
                 #frames = framesAll[serial]
@@ -216,10 +229,12 @@ class AlignedData():
                 alignedFrames = align.process(frames)
                 #depthFrame = frames[rs.stream.depth]
                 #colorFrame = frames[rs.stream.color]
-                #depthFrame = frames.get_depth_frame()
+                depthFrame = temporalFilter.process(alignedFrames.get_depth_frame())
                 #colorFrame = frames.get_color_frame()
-                deviceData['depth'] = copy.deepcopy(np.asanyarray(alignedFrames.get_depth_frame().get_data()))
+                deviceData['depth'] = copy.deepcopy(np.asanyarray(depthFrame.get_data()))
                 deviceData['color'] = copy.deepcopy(np.asanyarray(alignedFrames.get_color_frame().get_data()))
+                deviceData['intrinsics'] = depthFrame.get_profile().as_video_stream_profile().get_intrinsics()
+                deviceData['poseMat'] = self.devicesTransformation[device][0]
                 savedData[device]=deviceData
                 #print(str(i)+':'+str(frames.get_frame_number()))
                 #points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
@@ -228,17 +243,23 @@ class AlignedData():
             
             cloud = pcl.PointCloud_PointXYZRGBA()
             allPoints= {}
-            for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
-                cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
-                frames = savedData[serial]
+            #for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
+            for camera,deviceData in savedData.items():
+                #cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
+                
+                #frames = savedData[serial]
+                
                 #alignedFrames = align.process(frames)
-                depthFrame = frames['depth']
-                colorFrame = frames['color']
+                #print(camera)
+                depthFrame = deviceData['depth']
+                colorFrame = deviceData['color']
+                cameraIntrinsics = deviceData['intrinsics']
+                poseMat = deviceData['poseMat']
                 #depthFrame = alignedFrames.get_depth_frame()
                 #colorFrame = alignedFrames.get_color_frame()
                 
                 points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
-                allPoints[serial] = points
+                allPoints[camera] = points
             #cloud.from_array(allPoints.astype('float32'))
             pickle.dump(copy.deepcopy(allPoints),file)
             #time.sleep(1/30)
@@ -324,14 +345,14 @@ if __name__=="__main__":
     rsConfig = rs.config()
     resolutionWidth = 848
     resolutionHeight = 480
-    frameRate = 60
+    frameRate = 30
     rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
     rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
     rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_devices(enable_ir_emitter=True)
-    deviceManager.load_settings_json('DisparityShift.json')
+    #deviceManager.load_settings_json('DisparityShift.json')
     deviceCalibration = Calibrate(deviceManager,args.load,args.new)
     transformation = deviceCalibration.devicesTransformation
     intrinsics = deviceCalibration.devicesIntrinsics
