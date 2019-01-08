@@ -169,41 +169,6 @@ class AlignedData():
             savedData={}
             timeStamp = str(time.time())
             framesAll = deviceManager.poll_frames(raw=True)
-            #allPoints= np.empty((0,4))
-            """
-            for device,frames in framesAll.items():
-                deviceData = {}
-                #cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
-                #frames = framesAll[serial]
-                align = rs.align(rs.stream.color)
-                alignedFrames = align.process(frames)
-                #depthFrame = frames[rs.stream.depth]
-                #colorFrame = frames[rs.stream.color]
-                #depthFrame = frames.get_depth_frame()
-                #colorFrame = frames.get_color_frame()
-                deviceData['depth'] = copy.deepcopy(np.asanyarray(alignedFrames.get_depth_frame().get_data()))
-                deviceData['color'] = copy.deepcopy(np.asanyarray(alignedFrames.get_color_frame().get_data()))
-                savedData[device]=deviceData
-                #print(str(i)+':'+str(frames.get_frame_number()))
-                #points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
-                #points2 = self.generate_pointcloud(colorFrame, depthFrame, self.devicesIntrinsics, poseMat)
-                #allPoints = np.append(allPoints, points,axis=0)
-            """
-            
-            """
-            for device,frames in timeFrame.items():
-                #devices={}
-                deviceData = {}
-                alignedFrames = align.process(frames)
-                deviceData[rs.stream.depth] = copy.deepcopy(np.asanyarray(alignedFrames.get_depth_frame().get_data()))
-                deviceData[rs.stream.color] = copy.deepcopy(np.asanyarray(alignedFrames.get_color_frame().get_data()))
-                #for frame in alignedFrames:
-                #    frameData = np.asanyarray(frame.get_data())
-                #    deviceData[frame]=copy.deepcopy(frameData)
-                devices[device] = copy.deepcopy(deviceData)
-            """
-            #cloud.from_array(allPoints.astype('float32'))
-            #savedData[timeStamp]=cloud
             q.put(framesAll)
             i+=1
             print(str(i)+':' + str(framesAll['822512060522'].get_frame_number()))
@@ -215,57 +180,27 @@ class AlignedData():
         temporalFilter = rs.temporal_filter()
         temporalFilter.set_option(rs.option.filter_smooth_alpha, 0.26)
         temporalFilter.set_option(rs.option.filter_smooth_delta, 20)
-        
-        i=1
+        i=0
         while not q.empty():
             framesAll = q.get()
             savedData={}
             for device,frames in framesAll.items():
-                
                 deviceData = {}
-                #cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
-                #frames = framesAll[serial]
                 align = rs.align(rs.stream.color)
                 alignedFrames = align.process(frames)
-                #depthFrame = frames[rs.stream.depth]
-                #colorFrame = frames[rs.stream.color]
                 depthFrame = temporalFilter.process(alignedFrames.get_depth_frame())
+                rsIntrinsics = depthFrame.get_profile().as_video_stream_profile().get_intrinsics()
                 #colorFrame = frames.get_color_frame()
                 deviceData['depth'] = copy.deepcopy(np.asanyarray(depthFrame.get_data()))
                 deviceData['color'] = copy.deepcopy(np.asanyarray(alignedFrames.get_color_frame().get_data()))
-                deviceData['intrinsics'] = depthFrame.get_profile().as_video_stream_profile().get_intrinsics()
+                deviceData['intrinsics'] = {'ppx': rsIntrinsics.ppx, 'ppy':rsIntrinsics.ppy, 'fx':rsIntrinsics.fx, 'fy':rsIntrinsics.fy}
                 deviceData['poseMat'] = self.devicesTransformation[device][0]
                 savedData[device]=deviceData
-                #print(str(i)+':'+str(frames.get_frame_number()))
-                #points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
-                #points2 = self.generate_pointcloud(colorFrame, depthFrame, self.devicesIntrinsics, poseMat)
-                #allPoints = np.append(allPoints, points,axis=0)
-            
-            cloud = pcl.PointCloud_PointXYZRGBA()
-            allPoints= {}
-            #for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
-            for camera,deviceData in savedData.items():
-                #cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
-                
-                #frames = savedData[serial]
-                
-                #alignedFrames = align.process(frames)
-                #print(camera)
-                depthFrame = deviceData['depth']
-                colorFrame = deviceData['color']
-                cameraIntrinsics = deviceData['intrinsics']
-                poseMat = deviceData['poseMat']
-                #depthFrame = alignedFrames.get_depth_frame()
-                #colorFrame = alignedFrames.get_color_frame()
-                
-                points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
-                allPoints[camera] = points
-            #cloud.from_array(allPoints.astype('float32'))
-            pickle.dump(copy.deepcopy(allPoints),file)
+            pickle.dump(copy.deepcopy(savedData),file)
             #time.sleep(1/30)
             print('processed'+str(i))
-            q.task_done()
             i+=1
+            q.task_done()
         print('queue finished')
         file.close()
 
@@ -275,65 +210,10 @@ class AlignedData():
         worker2 = threading.Thread(target=self.processThread,args=(q,self.fileName))
         #worker2 = Process(target=self.processThread,args=(q,))
         worker1.start()
-        time.sleep(1)
+        time.sleep(0.25)
         worker2.start()
         worker2.join()
         q.join()
-        
-    """
-    def stream(self):
-        pointsAll = []
-        alignTo = rs.stream.color
-        align = rs.align(alignTo)
-        framesAll = self.deviceManager.poll_frames(raw=True)
-        for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
-            cameraIntrinsics = self.devicesIntrinsics[serial][rs.stream.depth]
-            frames = framesAll[serial]
-            alignedFrames = align.process(frames)
-            #depthFrame = frames[rs.stream.depth]
-            #colorFrame = frames[rs.stream.color]
-            depthFrame = alignedFrames.get_depth_frame()
-            colorFrame = alignedFrames.get_color_frame()
-
-            points = self.depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
-            #points2 = self.generate_pointcloud(colorFrame, depthFrame, self.devicesIntrinsics, poseMat)
-            pointsAll = pointsAll+points
-            #print("wait")
-        file = open('finaltest.ply',"w")
-        file.write('''ply
-        format ascii 1.0
-        element vertex %d
-        property float x
-        property float y
-        property float z
-        property uchar red
-        property uchar green
-        property uchar blue
-        property uchar alpha
-        end_header
-        %s
-        '''%(len(pointsAll),"".join(pointsAll)))
-        file.close()
-        ##dt = [("x", 'f4'), ("y", 'f4'), ("z", 'f4')]
-        ##verts = np.array(list(zip(*pointsAll.T)), dtype=dt)
-        ##el = PlyElement.describe(verts, 'vertex')
-        ##PlyData([el]).write("all_DP2PC.ply")
-    """
-    """
-        #Using RS export to PLY
-        pc = rs.pointcloud()
-        pc.map_to(colorFrame)
-        points = rs.points()
-        points = pc.calculate(depthFrame)
-        vertices = np.array(np.asanyarray(points.get_vertices()).tolist())
-        points.export_to_ply(serial+"_RSPC.ply",colorFrame)
-    """
-
-            
-
-
-
-
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
