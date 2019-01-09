@@ -175,7 +175,7 @@ class AlignedData():
 
 
     def processThread(self,q,fileName):
-        file = open('dataStore'+str(fileName),'wb')
+        file = open('dataStore'+str(fileName)+'.pickle','wb')
         align = rs.align(rs.stream.color)
         temporalFilter = rs.temporal_filter()
         temporalFilter.set_option(rs.option.filter_smooth_alpha, 0.26)

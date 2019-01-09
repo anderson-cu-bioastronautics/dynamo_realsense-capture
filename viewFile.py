@@ -4,14 +4,17 @@ import pcl
 import pcl.pcl_visualization
 import time
 import numpy as np
+import multiprocessing
+import threading
+import queue
 
-def depthFrametoPC(depth, rgb, cameraIntrinsics, poseMat):
-    starttime = time.time()
+def depthFrametoPC(deviceData):
+    #starttime = time.time()
+    depth = deviceData['depth']
+    rgb = deviceData['color']
+    cameraIntrinsics = deviceData['intrinsics']
+    poseMat = deviceData['poseMat']
     [height,width] = np.array(depth.shape)
-    #[height, width] = [depthFrame.get_height(), depthFrame.get_width()]
-    #depth = np.asanyarray(depthFrame.get_data())
-    #rgb = np.asanyarray(colorFrame.get_data())
-    ##time1 = time.time()
     nx = np.linspace(0, width-1, width)
     ny = np.linspace(0, height-1, height)
     u, v = np.meshgrid(nx, ny)
@@ -43,26 +46,68 @@ def depthFrametoPC(depth, rgb, cameraIntrinsics, poseMat):
     return allPoints
 
 
-filename = 'dataStore1'
-file = open(filename, 'rb')
-#dataRead = []
-cloud = pcl.PointCloud_PointXYZRGBA()
-visual = pcl.pcl_visualization.CloudViewing()
-time.sleep(2)
-i = 1
+def importThread(qFiles,fileName):
+    while 1:
+        try:
+            frame = pickle.load(fileName)
+            qFiles.put(frame)
+        except EOFError:
+            return
+
+def processThread(qFiles):
+    import pcl
+    p = multiprocessing.Pool(6)
+    visual = pcl.pcl_visualization.CloudViewing()
+    i=0
+    while not qFiles.empty():
+        cloud = pcl.PointCloud_PointXYZRGBA()
+        frame = qFiles.get()
+        listP = [data for serial, data in frame.items()]
+        """
+        for serial, data in frame.items():
+            listP.append(data)
+        """
+        cameraPoints = p.map(depthFrametoPC, listP)
+        allPoints = np.empty((0,4))
+        for camera in cameraPoints:
+            allPoints = np.append(allPoints, camera, axis=0)
+        #p.close()
+        cloud.from_array(allPoints.astype('float32'))
+        visual.ShowColorACloud(cloud)
+        #qDisplay.put(allPoints)
+        print(i)
+        i+=1
+        qFiles.task_done()
+
+def main():
+    filename = 'dataStore1'
+    fileName = open(filename, 'rb')
+    qFiles = queue.Queue(maxsize=0)
+    worker1 = threading.Thread(target=importThread,args=(qFiles,fileName))
+    worker2 = threading.Thread(target=processThread,args=(qFiles,))
+    worker1.start()
+    worker1.join()
+    time.sleep(0.25)
+    worker2.start()
+    worker2.join()
+    qFiles.join()
+
+
+if __name__=="__main__":
+    multiprocessing.freeze_support()
+    main()
+
+"""
 while 1:
     try:
-        frame = pickle.load(file) #this loads each frame in one at a time, this is where we can process each frame with the transformation matrix
+         #this loads each frame in one at a time, this is where we can process each frame with the transformation matrix
         cloud = pcl.PointCloud_PointXYZRGBA()
         allPoints = np.empty((0,4))
         #for (serial, [poseMat, rmsdValue]) in self.devicesTransformation.items():
-        for camera,deviceData in frame.items():
-            depthFrame = deviceData['depth']
-            colorFrame = deviceData['color']
-            cameraIntrinsics = deviceData['intrinsics']
-            poseMat = deviceData['poseMat']
-            points = depthFrametoPC(depthFrame, colorFrame, cameraIntrinsics, poseMat)
-            allPoints = np.append(allPoints, points,axis=0)
+        #for camera,deviceData in frame.items():
+        #    points = depthFrametoPC(deviceData)
+        #    allPoints = np.append(allPoints, points,axis=0)
+        allPoints = p.map(depthFrametoPC, list(frame.items()))
         cloud.from_array(allPoints.astype('float32'))
         visual.ShowColorACloud(cloud)
         print(i)
@@ -70,3 +115,4 @@ while 1:
     except EOFError:
         break
 #print(dataRead)
+"""
