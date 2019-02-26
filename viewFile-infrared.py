@@ -11,7 +11,8 @@ import cv2
 def depthFrametoPC(deviceData):
     #starttime = time.time()
     depth = deviceData['depth']
-    rgb = deviceData['color']
+    infrared = deviceData['infrared']
+    rgb = cv2.cvtColor(np.asanyarray(infrared),cv2.COLOR_GRAY2RGB)
     cameraIntrinsics = deviceData['intrinsics']
     poseMat = deviceData['poseMat']
     [height,width] = np.array(depth.shape)
@@ -60,7 +61,7 @@ def processThread(qFiles):
     visual = pcl.pcl_visualization.CloudViewing()
     i=0
     while not qFiles.empty():
-        if i >100:
+        if i >5:
             cloud = pcl.PointCloud_PointXYZRGBA()
             frame = qFiles.get()
             listP = [data for serial, data in frame.items()]
@@ -73,7 +74,7 @@ def processThread(qFiles):
             for camera in cameraPoints:
                 allPoints = np.append(allPoints, camera, axis=0)
             #p.close()
-            cv2.imshow('color', frame['822512060522']['color'])
+            cv2.imshow('color', frame['822512060522']['infrared'])
             cv2.waitKey(1)
             cloud.from_array(allPoints.astype('float32'))
             visual.ShowColorACloud(cloud)
@@ -83,7 +84,7 @@ def processThread(qFiles):
         qFiles.task_done()
 
 def main():
-    filename = 'loco12DS5footTM5.pickle'
+    filename = 'dataStore1.pickle'
     fileName = open(filename, 'rb')
     qFiles = queue.Queue(maxsize=0)
     worker1 = threading.Thread(target=importThread,args=(qFiles,fileName))
