@@ -157,6 +157,11 @@ class DeviceManager:
         sensor.set_option(rs.option.emitter_enabled, 1 if enable_ir_emitter else 0)
         self._enabled_devices[device_serial] = (Device(pipeline, pipeline_profile))
 
+    def disable_all_devices(self):
+        for (serial, device) in self._enabled_devices.items():
+            device.pipeline.stop()
+        self._config.disable_all_streams()
+
     def enable_all_devices(self, enable_ir_emitter=False):
         """
         Enable all the Intel RealSense Devices which are connected to the PC
@@ -202,59 +207,71 @@ class DeviceManager:
         """
 
         frameCollection = {}
-        for (serial, device) in self._enabled_devices.items():
-            frameCollection[serial] = {}
-            pipeline = device.pipeline
-            streams = device.pipeline_profile.get_streams()
-            frames = pipeline.wait_for_frames()
-            frames.keep()
-            if ('raw') in kwargs:
-                if kwargs['raw'] == True:
-                    frameCollection[serial] = frames
-                else:
-                    pass
-            else:
-                for stream in streams:
-                    if stream.stream_type() == rs.stream.infrared:
-                        key_ = (stream.stream_type(), stream.stream_index())
-                        frame = frames.get_infrared_frame(stream.stream_index())
-                    elif stream.stream_type() == rs.stream.depth:
-                        key_ = stream.stream_type()
-                        frame = frames.get_depth_frame()
-                    elif stream.stream_type() == rs.stream.color:
-                        key_ = stream.stream_type()
-                        frame = frames.get_color_frame()
-                    frameCollection[serial][key_] = frame
+        while len(frameCollection) != len(self._enabled_devices) :
+            for (serial, device) in self._enabled_devices.items():
+                if not serial in frameCollection:
+                    #frameCollection[serial] = {}
+                    pipeline = device.pipeline
+                    frames = pipeline.poll_for_frames()
+                    frames.keep()
+                    if frames.size() != 0:
+                        frameCollection[serial] = frames
+                """
+                    if frames.size() != 0:
+                        if ('raw') in kwargs:
+                            if kwargs['raw'] == True:
+                                frameCollection[serial] = frames
+                            else:
+                                pass
+                        else:
+                            for stream in streams:
+                                if stream.stream_type() == rs.stream.infrared:
+                                    key_ = (stream.stream_type(), stream.stream_index())
+                                    frame = frames.get_infrared_frame(stream.stream_index())
+                                elif stream.stream_type() == rs.stream.depth:
+                                    key_ = stream.stream_type()
+                                    frame = frames.get_depth_frame()
+                                elif stream.stream_type() == rs.stream.color:
+                                    key_ = stream.stream_type()
+                                    frame = frames.get_color_frame()
+                                frameCollection[serial][key_] = frame
                 
+                    else:
+                        pas
+                #except:
+                    #pass
+                """
+        #print(frameCollection)
+        #print(str(frameCollection['822512060853'].get_frame_number()))
         return frameCollection
 
                 
 
-    # def poll_frames(self):
-    #     """
-    #     Poll for frames from the enabled Intel RealSense devices.
-    #     If temporal post processing is enabled, the depth stream is averaged over a certain amount of frames
+    def poll_frames2(self):
+        """
+        Poll for frames from the enabled Intel RealSense devices.
+        If temporal post processing is enabled, the depth stream is averaged over a certain amount of frames
 
-    #     Parameters:
-    #     -----------
+        Parameters:
+        -----------
 
-    #     """
-    #     frames = {}
-    #     for (serial, device) in self._enabled_devices.items():
-    #         streams = device.pipeline_profile.get_streams()
-    #         frameset = rs.composite_frame(rs.frame())
-    #         device.pipeline.poll_for_frames(frameset)
-    #         if frameset.size() == len(streams):
-    #             frames[serial] = {}
-    #             for stream in streams:
-    #                 if (rs.stream.infrared == stream.stream_type()):
-    #                     key_ = (stream.stream_type(), stream.stream_index())
-    #                 else:
-    #                     key_ = stream.stream_type()
-    #                 frame = frameset.first_or_default(stream.stream_type())
-    #                 frames[serial][key_] = frame
+        """
+        frames = {}
+        for (serial, device) in self._enabled_devices.items():
+            streams = device.pipeline_profile.get_streams()
+            #frameset = rs.composite_frame(rs.frame())
+            frameset = device.pipeline.poll_for_frames()
+            if frameset.size() == len(streams):
+                frames[serial] = {}
+                for stream in streams:
+                    if (rs.stream.infrared == stream.stream_type()):
+                        key_ = (stream.stream_type(), stream.stream_index())
+                    else:
+                        key_ = stream.stream_type()
+                    frame = frameset.first_or_default(stream.stream_type())
+                    frames[serial][key_] = frame
 
-    #     return frames
+        return frames
 
     def get_depth_shape(self):
         """ Retruns width and height of the depth stream for one arbitrary device
@@ -317,8 +334,7 @@ class DeviceManager:
         """
         device_extrinsics = {}
         for (serial, frameset) in frames.items():
-            device_extrinsics[serial] = frameset[
-                rs.stream.depth].get_profile().as_video_stream_profile().get_extrinsics_to(
+            device_extrinsics[serial] = frameset[rs.stream.depth].get_profile().as_video_stream_profile().get_extrinsics_to(
                 frameset[rs.stream.color].get_profile())
         return device_extrinsics
 

@@ -38,7 +38,7 @@ class Calibrate():
             #Define Calibration Target
             self.chessboardHeight = 4 #3#6 #squares
             self.chessboardWidth = 5 #5#9 #squares
-            self.chessboardSquareSize = 0.0253 #0.049 #0.0253 #m
+            self.chessboardSquareSize = 0.0762 #0.049 #0.0253 #m
             
             #Perform Calibration steps
             time.sleep(1)
@@ -173,7 +173,7 @@ class AlignedData():
     def captureThread(self,q,deviceManager):
         i=0
         fnumber = deviceManager.poll_frames(raw=True)['822512060853'].get_frame_number()
-        while i<30:
+        while i<150:
             #cloud = pcl.PointCloud_PointXYZRGBA()
             #savedData={}
             #timeStamp = str(time.time())
@@ -273,7 +273,7 @@ if __name__=="__main__":
     while True:
         data = AlignedData(transformation, intrinsics, deviceManager,fname)
         input("Data Collection complete, press Enter to continue...")
-        time.sleep(6)
+        #time.sleep(6)
         fname+=1
 
 
