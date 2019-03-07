@@ -13,9 +13,6 @@ import multiprocessing
 import pickle
 import queue
 
-from pclpy import pcl
-import pcl
-import pcl.pcl_visualization
 
 import argparse
 
@@ -249,8 +246,10 @@ if __name__=="__main__":
     rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
-    deviceManager.enable_all_devices(enable_ir_emitter=True)
-    deviceManager.load_settings_json('DisparityShift6.json')
+    deviceManager.enable_all_emitters()
+    deviceManager.load_settings_json('DisparityShift5.json')
+    deviceManager.enable_all_devices()
+    
     deviceCalibration = Calibrate(deviceManager,args.load,args.new)
     transformation = deviceCalibration.devicesTransformation
     intrinsics = deviceCalibration.devicesIntrinsics

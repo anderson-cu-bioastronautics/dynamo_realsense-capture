@@ -134,6 +134,7 @@ class DeviceManager:
         self._config = pipeline_configuration
         self._frame_counter = 0
 
+
     def enable_device(self, device_serial, enable_ir_emitter):
         """
         Enable an Intel RealSense Device
@@ -153,8 +154,9 @@ class DeviceManager:
         pipeline_profile = pipeline.start(self._config)
 
         # Set the acquisition parameters
+
         sensor = pipeline_profile.get_device().first_depth_sensor()
-        sensor.set_option(rs.option.emitter_enabled, 1 if enable_ir_emitter else 0)
+        #sensor.set_option(rs.option.emitter_enabled, 1 if enable_ir_emitter else 0)
         self._enabled_devices[device_serial] = (Device(pipeline, pipeline_profile))
 
     def disable_all_devices(self):
@@ -172,21 +174,22 @@ class DeviceManager:
         for serial in self._available_devices:
             self.enable_device(serial, enable_ir_emitter)
 
-    def enable_emitter(self, enable_ir_emitter=True):
+    def enable_all_emitters(self):
         """
-        Enable/Disable the emitter of the intel realsense device
-
+        Enable/Disable the emitters of all the connected intel realsense device
+        Modified to be done before activiating device, performed using rs.context
         """
-        for (device_serial, device) in self._enabled_devices.items():
+        for device in self._context.devices:
             # Get the active profile and enable the emitter for all the connected devices
-            sensor = device.pipeline_profile.get_device().first_depth_sensor()
-            sensor.set_option(rs.option.emitter_enabled, 1 if enable_ir_emitter else 0)
-            if enable_ir_emitter:
-                sensor.set_option(rs.option.laser_power, 360)
+            sensor = device.first_depth_sensor()
+            sensor.set_option(rs.option.emitter_enabled, 1)
+            sensor.set_option(rs.option.laser_power, 360)
 
     def load_settings_json(self, path_to_settings_file):
         """
         Load the settings stored in the JSON file
+
+        Modified to grab device from context and not from enabled devices, run before enabling devices to avoid bugs
 
         """
 
@@ -194,9 +197,9 @@ class DeviceManager:
         json_text = file.read().strip()
         file.close()
 
-        for (device_serial, device) in self._enabled_devices.items():
+        for device in self._context.devices:
             # Get the active profile and load the json file which contains settings readable by the realsense
-            device = device.pipeline_profile.get_device()
+            #device = device.pipeline_profile.get_device()
             advanced_mode = rs.rs400_advanced_mode(device)
             advanced_mode.load_json(json_text)
 
