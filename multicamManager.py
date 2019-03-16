@@ -12,7 +12,7 @@ import sys
 import multiprocessing 
 import pickle
 import queue
-
+import os
 
 import argparse
 
@@ -20,14 +20,17 @@ class Calibrate():
 
     def __init__(self, device_manager,load,new):
         self.deviceManager = device_manager  
+        
         #for frame in range(30): #disposes 30 frames to stabilize autoexposure
         time.sleep(1) #allow for auto-exposure to stabilize and frames to start coming in 
-        frames = self.deviceManager.poll_frames2()
-        self.devicesIntrinsics = self.deviceManager.get_device_intrinsics(frames)
+        
         if load:
             file = open(load,'rb')
             self.devicesTransformation = pickle.load(file)
         elif new:
+            self.deviceManager.enable_all_devices()
+            #frames = self.deviceManager.poll_frames2()
+            
             file = open(new+'.cal','wb')
             self.devicesChessboardLocations = {}
             self.devicesTransformation = {}
@@ -51,6 +54,11 @@ class Calibrate():
         chessboardDeviceCount = 0
         while len(self.devicesChessboardLocations) < len(self.deviceManager._available_devices):
             cameraFrames = self.deviceManager.poll_frames(raw=True)
+            frames = self.deviceManager.poll_frames2()
+            #print(len(cameraFrames))
+            #print(len(frames))
+            self.devicesIntrinsics = self.deviceManager.get_device_intrinsics(cameraFrames)
+            #print(len(self.devicesIntrinsics))
             for device, frames in cameraFrames.items(): #this will iterate through each device's serial number (which are used as keys in the frames object)
                 if not device in self.devicesChessboardLocations:
                     #cameraFrames = self.deviceManager.poll_frames(raw=True)
@@ -121,56 +129,20 @@ class Calibrate():
 
     
 class AlignedData():
-    def __init__(self, devicesTransformation, devicesIntrisics, deviceManager,fileName):
+    def __init__(self, devicesTransformation, deviceManager,fileName,folder,time):
         self.devicesTransformation = devicesTransformation
         self.deviceManager = deviceManager
-        self.devicesIntrinsics = devicesIntrisics
         self.fileName = fileName
+        self.folder = folder
+        self.time = time
         self.stream()
         
-
-    def depthFrametoPC(self, depth, rgb, cameraIntrinsics, poseMat):
-        starttime = time.time()
-        [height,width] = np.array(depth.shape)
-        #[height, width] = [depthFrame.get_height(), depthFrame.get_width()]
-        #depth = np.asanyarray(depthFrame.get_data())
-        #rgb = np.asanyarray(colorFrame.get_data())
-        ##time1 = time.time()
-        nx = np.linspace(0, width-1, width)
-        ny = np.linspace(0, height-1, height)
-        u, v = np.meshgrid(nx, ny)
-        x = (u.flatten() - cameraIntrinsics.ppx)/cameraIntrinsics.fx
-        y = (v.flatten() - cameraIntrinsics.ppy)/cameraIntrinsics.fy
-        z = depth.flatten() / 1000
-        x = np.multiply(x,z)
-        y = np.multiply(y,z)
-        ##time2 = time.time()
-        #x = x[np.nonzero(z)]
-        #y = y[np.nonzero(z)]
-        #z = z[np.nonzero(z)]
-
-        rgbB = rgb[:,:,0].flatten().astype(int)
-        rgbG = rgb[:,:,1].flatten().astype(int)
-        rgbR = rgb[:,:,2].flatten().astype(int)
-        rgbPC = rgbR<<16|rgbG<<8|rgbB
-        ##time3=time.time()
-        points = np.asanyarray([x,y,z])
-
-        n = points.shape[1] 
-        points_ = np.vstack((points, np.ones((1,n))))
-        points_trans_ = np.matmul(poseMat, points_)
-        points_transformed = np.true_divide(points_trans_[:3,:], points_trans_[[-1], :])
-        ##time4=time.time()
-        allPoints = np.asanyarray([points_transformed[0,:],points_transformed[1,:],points_transformed[2,:],rgbPC]).T
-        ##times = np.array([time1,time2,time3,time4])-starttime
-        ##print(times)
-        return allPoints
 
 
     def captureThread(self,q,deviceManager):
         i=0
         fnumber = deviceManager.poll_frames(raw=True)['822512060853'].get_frame_number()
-        while i<150:
+        while i<(90*int(self.time)):
             #cloud = pcl.PointCloud_PointXYZRGBA()
             #savedData={}
             #timeStamp = str(time.time())
@@ -185,8 +157,14 @@ class AlignedData():
             fnumber = newfnumber
 
 
-    def processThread(self,q,fileName):
-        file = open('dataStore'+str(fileName)+'.pickle','wb')
+    def processThread(self,q,fileName,folder):
+        script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
+        scriptDir = os.path.split(script_path)[0]
+        loc = folder+'\\'+str(format(fileName, '02d'))
+        if not os.path.isdir(os.path.join(os.getcwd(), folder)):
+            os.mkdir(folder)
+        if not os.path.isdir(os.path.join(os.getcwd(), loc)):
+            os.mkdir(folder+'\\'+str(format(fileName, '02d')))
         align = rs.align(rs.stream.depth)
         #temporalFilter = rs.temporal_filter()
         #temporalFilter.set_option(rs.option.filter_smooth_alpha, 0.26)
@@ -194,6 +172,8 @@ class AlignedData():
         i=0
         while not q.empty():
             framesAll = q.get()
+            fname = loc+'\\'+str(format(i, '05d'))+'.pickle'
+            file = open(os.path.join(scriptDir,fname),'wb')
             savedData={}
             for device,frames in framesAll.items():
                 deviceData = {}
@@ -215,17 +195,18 @@ class AlignedData():
             #time.sleep(1/30)
             print('processed'+str(i))
             i+=1
+            file.close()
             q.task_done()
         print('queue finished')
-        file.close()
+        
 
     def stream(self):
         q = queue.Queue(maxsize=0)
         worker1 = threading.Thread(target=self.captureThread,args=(q,deviceManager))
-        worker2 = threading.Thread(target=self.processThread,args=(q,self.fileName))
+        worker2 = threading.Thread(target=self.processThread,args=(q,self.fileName,self.folder))
         #worker2 = Process(target=self.processThread,args=(q,))
         worker1.start()
-        time.sleep(5.5)
+        time.sleep(int(self.time)+1)
         worker2.start()
         worker2.join()
         q.join()
@@ -236,6 +217,11 @@ if __name__=="__main__":
                         nargs='?')
     parser.add_argument("--new", help="new calibration",
                         nargs='?',default='new')
+
+    parser.add_argument("--folder", help="data folder",
+                        nargs = '?', default="data")
+    parser.add_argument("--time", help="time to collect data (s)",
+                        nargs = '?', default="10")
     args = parser.parse_args()
     rsConfig = rs.config()
     resolutionWidth = 848
@@ -247,12 +233,11 @@ if __name__=="__main__":
 
     deviceManager = DeviceManager(rs.context(), rsConfig)
     deviceManager.enable_all_emitters()
-    deviceManager.load_settings_json('DisparityShift5.json')
-    deviceManager.enable_all_devices()
+    deviceManager.load_settings_json('calibrationSettings.json')
+    #deviceManager.enable_all_devices()
     
     deviceCalibration = Calibrate(deviceManager,args.load,args.new)
     transformation = deviceCalibration.devicesTransformation
-    intrinsics = deviceCalibration.devicesIntrinsics
 
     deviceManager.disable_all_devices()
     resolutionWidth = 848
@@ -263,14 +248,14 @@ if __name__=="__main__":
     rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
     rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
     #rsConfig.disable_stream(rs.stream.color)
-    deviceManager.load_settings_json('DisparityShift5.json')
-    deviceManager.enable_all_devices(enable_ir_emitter=True)
+    deviceManager.load_settings_json('captureSettings.json')
+    deviceManager.enable_all_devices()
     #rsConfig.enable_stream(rs.stream.color, resolutionWidth, resolutionHeight, rs.format.bgr8, frameRate)
     input("Calibration complete, press Enter to continue...")
     #time.sleep(6)
     fname = 1
     while True:
-        data = AlignedData(transformation, intrinsics, deviceManager,fname)
+        data = AlignedData(transformation, deviceManager,fname,args.folder,args.time)
         input("Data Collection complete, press Enter to continue...")
         #time.sleep(6)
         fname+=1
