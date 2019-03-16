@@ -1,5 +1,6 @@
 import pickle
-from pclpy import pcl
+#from pclpy import pcl
+#import pclpy
 import pcl
 import pcl.pcl_visualization
 import time
@@ -8,6 +9,10 @@ import multiprocessing
 import threading
 import queue
 import cv2
+import argparse
+import os
+
+
 def depthFrametoPC(deviceData):
     #starttime = time.time()
     depth = deviceData['depth']
@@ -47,23 +52,38 @@ def depthFrametoPC(deviceData):
     return allPoints
 
 
-def importThread(qFiles,fileName):
+def importThread(qFiles,folder,iteration):
     while 1:
+        i = 0
         try:
-            frame = pickle.load(fileName)
+            script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
+            scriptDir = os.path.split(script_path)[0]
+            print(i)
+            fname = folder+'\\'+str(format(int(iteration), '02d'))+'\\'+str(format(i, '05d'))+'.pickle'
+            file = open(os.path.join(scriptDir,fname),'rb')
+            frame = pickle.load(file)
             qFiles.put(frame)
-        except EOFError:
+            i+=1
+        except:
             return
 
-def processThread(qFiles):
-    import pcl
+def processThread(folder,iteration):
+    #import pclpy
+    #import pcl
     p = multiprocessing.Pool(6)
     visual = pcl.pcl_visualization.CloudViewing()
     i=0
-    while not qFiles.empty():
-        if i >5:
+    while True:
+        try:
+            script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
+            scriptDir = os.path.split(script_path)[0]
+            print(i)
+            fname = folder+'\\'+str(format(int(iteration), '02d'))+'\\'+str(format(i, '05d'))+'.pickle'
+            file = open(os.path.join(scriptDir,fname),'rb')
+            frame = pickle.load(file)
+            file.close()
+            #i+=1
             cloud = pcl.PointCloud_PointXYZRGBA()
-            frame = qFiles.get()
             listP = [data for serial, data in frame.items()]
             """
             for serial, data in frame.items():
@@ -72,6 +92,7 @@ def processThread(qFiles):
             cameraPoints = p.map(depthFrametoPC, listP)
             allPoints = np.empty((0,4))
             for camera in cameraPoints:
+                #camera = depthFrametoPC(item)
                 allPoints = np.append(allPoints, camera, axis=0)
             #p.close()
             cv2.imshow('color', frame['822512060522']['infrared'])
@@ -79,25 +100,33 @@ def processThread(qFiles):
             cloud.from_array(allPoints.astype('float32'))
             visual.ShowColorACloud(cloud)
             #qDisplay.put(allPoints)
-            print(i)
-        i+=1
-        qFiles.task_done()
+            #print(i)
+            i+=1
+        except:
+            pass
 
-def main():
-    filename = 'dataStore1.pickle'
-    fileName = open(filename, 'rb')
-    qFiles = queue.Queue(maxsize=0)
-    worker1 = threading.Thread(target=importThread,args=(qFiles,fileName))
-    worker2 = threading.Thread(target=processThread,args=(qFiles,))
-    worker1.start()
-    worker1.join()
-    time.sleep(0.25)
-    worker2.start()
-    worker2.join()
-    qFiles.join()
+def main(folder,iteration):
+    processThread(folder,iteration)
+    #filename = 'dataStore1.pickle'
+    #fileName = open(filename, 'rb')
+    #qFiles = queue.Queue(maxsize=0)
+    #worker1 = threading.Thread(target=importThread,args=(qFiles,folder,iteration))
+    #worker2 = threading.Thread(target=processThread,args=(qFiles))
+    #worker1.start()
+    #worker1.join()
+    #time.sleep(0.25)
+    #worker2.start()
+    #worker2.join()
+    #qFiles.join()
 
 
 if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--folder", help="folder with data files",
+                        nargs='?',default='data')
+    parser.add_argument("--iteration", help="iteration of data to process",
+                        nargs='?',default=1)
+    args = parser.parse_args()
     multiprocessing.freeze_support()
-    main()
+    main(args.folder,args.iteration)
 
