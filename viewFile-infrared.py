@@ -11,6 +11,11 @@ import queue
 import cv2
 import argparse
 import os
+import signal
+import sys
+
+def signalHandler(signal,frame):
+    sys.exit()
 
 
 def depthFrametoPC(deviceData):
@@ -29,66 +34,44 @@ def depthFrametoPC(deviceData):
     z = depth.flatten() / 1000
     x = np.multiply(x,z)
     y = np.multiply(y,z)
-    ##time2 = time.time()
-    #x = x[np.nonzero(z)]
-    #y = y[np.nonzero(z)]
-    #z = z[np.nonzero(z)]
+
 
     rgbB = rgb[:,:,0].flatten().astype(int)
     rgbG = rgb[:,:,1].flatten().astype(int)
     rgbR = rgb[:,:,2].flatten().astype(int)
     rgbPC = rgbR<<16|rgbG<<8|rgbB
-    ##time3=time.time()
     points = np.asanyarray([x,y,z])
 
     n = points.shape[1] 
     points_ = np.vstack((points, np.ones((1,n))))
     points_trans_ = np.matmul(poseMat, points_)
     points_transformed = np.true_divide(points_trans_[:3,:], points_trans_[[-1], :])
-    ##time4=time.time()
     allPoints = np.asanyarray([points_transformed[0,:],points_transformed[1,:],points_transformed[2,:],rgbPC]).T
-    ##times = np.array([time1,time2,time3,time4])-starttime
-    ##print(times)
     return allPoints
 
 
-def importThread(qFiles,folder,iteration):
-    while 1:
-        i = 0
-        try:
-            script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
-            scriptDir = os.path.split(script_path)[0]
-            print(i)
-            fname = folder+'\\'+str(format(int(iteration), '02d'))+'\\'+str(format(i, '05d'))+'.pickle'
-            file = open(os.path.join(scriptDir,fname),'rb')
-            frame = pickle.load(file)
-            qFiles.put(frame)
-            i+=1
-        except:
-            return
-
-def processThread(folder,iteration):
+def processThread(folder,iteration,full):
     #import pclpy
     #import pcl
     p = multiprocessing.Pool(6)
     visual = pcl.pcl_visualization.CloudViewing()
+    signal.signal(signal.SIGINT, signalHandler)
     i=0
     while True:
+        if not full:
+            i+=10
+
+        script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
+        scriptDir = os.path.split(script_path)[0]
+        print(i)
+        fname = folder+'\\'+str(format(int(iteration), '02d'))+'\\'+str(format(i, '05d'))+'.pickle'
+        file = open(os.path.join(scriptDir,fname),'rb')
+        frame = pickle.load(file)
+        file.close()
+        #i+=1
+        cloud = pcl.PointCloud_PointXYZRGBA()
+        listP = [data for serial, data in frame.items()]
         try:
-            script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
-            scriptDir = os.path.split(script_path)[0]
-            print(i)
-            fname = folder+'\\'+str(format(int(iteration), '02d'))+'\\'+str(format(i, '05d'))+'.pickle'
-            file = open(os.path.join(scriptDir,fname),'rb')
-            frame = pickle.load(file)
-            file.close()
-            #i+=1
-            cloud = pcl.PointCloud_PointXYZRGBA()
-            listP = [data for serial, data in frame.items()]
-            """
-            for serial, data in frame.items():
-                listP.append(data)
-            """
             cameraPoints = p.map(depthFrametoPC, listP)
             allPoints = np.empty((0,4))
             for camera in cameraPoints:
@@ -99,26 +82,10 @@ def processThread(folder,iteration):
             cv2.waitKey(1)
             cloud.from_array(allPoints.astype('float32'))
             visual.ShowColorACloud(cloud)
-            #qDisplay.put(allPoints)
-            #print(i)
             i+=1
-        except:
-            pass
-
-def main(folder,iteration):
-    processThread(folder,iteration)
-    #filename = 'dataStore1.pickle'
-    #fileName = open(filename, 'rb')
-    #qFiles = queue.Queue(maxsize=0)
-    #worker1 = threading.Thread(target=importThread,args=(qFiles,folder,iteration))
-    #worker2 = threading.Thread(target=processThread,args=(qFiles))
-    #worker1.start()
-    #worker1.join()
-    #time.sleep(0.25)
-    #worker2.start()
-    #worker2.join()
-    #qFiles.join()
-
+        except KeyboardInterrupt:
+            p.terminate()
+        
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -126,7 +93,9 @@ if __name__=="__main__":
                         nargs='?',default='data')
     parser.add_argument("--iteration", help="iteration of data to process",
                         nargs='?',default=1)
+    parser.add_argument("--full", help="playback at full fps",
+                        nargs='?', default=0)
     args = parser.parse_args()
     multiprocessing.freeze_support()
-    main(args.folder,args.iteration)
+    processThread(args.folder,args.iteration,args.full)
 
