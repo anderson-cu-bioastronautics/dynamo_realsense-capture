@@ -91,7 +91,7 @@ The package contains the following functions
 
 See [examples](examples/examples.md) for tutorials on how to use this package.
 
-See this [notebook](tutorial.ipynb) for am explanation of the processes used in the included functions. 
+See this [notebook](tutorial.ipynb) for an explanation of the processes used in the included functions. 
 
 ## Testing
 
