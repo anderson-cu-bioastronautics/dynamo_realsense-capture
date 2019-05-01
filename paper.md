@@ -7,10 +7,10 @@ tags:
     - motion capture
 authors:
     - name: Abhishektha Boppana
-      orcid:
+      orcid: 0000-0003-4260-0488
       affiliation: 1
     - name: Allison P. Anderson
-      orcid:
+      orcid: 0000-0001-7808-8557
       affiliation: 1
 affiliations:
     - name: Ann and H.J. Smead Department of Aerospace Engineering Sciences, University of Colorado Boulder

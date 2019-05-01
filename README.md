@@ -68,7 +68,7 @@ If you wish to setup a new environment, an Anaconda [environment](environment.ym
 An optional dependency is [`pptk`](https://github.com/heremaps/pptk), which is used to view sample data, tutorial, and to test installation. 
 `pptk` can be installed by using `pip install pptk`. 
 
-Once you have your Python environment and dependencies setup, clone or download this repository to your workspace as a submodule. 
+Once you have your Python environment and dependencies setup, clone or download this repository and then run ``python setup.py install`` to install the package into your environment.
 
 ## Included Functions
 
