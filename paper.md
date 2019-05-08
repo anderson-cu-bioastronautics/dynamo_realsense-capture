@@ -25,13 +25,13 @@ Human body shape has been previously captured with a variety of methodologies, i
 However these technologies require expensive modules and have limited ability to capture dynamic changes in body shape. 
 
 Similarly, motion capture with specific markers is commonly done through camera-based motion tracking [@Windolf:2008]
-Specific systems for marker tracking are also very cost prohibitive. 
+Specific systems for marker tracking are also very cost prohibitive and do not capture surface morphology.
 
 Recently, Intel has released the D415 and D435 RealSense Depth Cameras, which use near-infrared structured light patterns and two infrared imagers to capture depth information at up to 90 frames per second.
 Purchasing a set of these cameras is much more affordable than buying a dedicated motion capture system for shape or marker tracking.
 
 While Intel provides the [``librealsense``](https://github.com/IntelRealSense/librealsense)  library to interface with their cameras, tools are not provided to use multiple devices at once to capture shape and marker-tracking information.
-``Dynamo`` builds upon [``librealsense``](https://github.com/IntelRealSense/librealsense) to provide additional capability for researchers looking to capture such data.
+``DynaMo`` builds upon [``librealsense``](https://github.com/IntelRealSense/librealsense) to provide additional capability for researchers looking to capture such data.
 
 ![Sample Frames of DynaMo](documentation/sampleFrames.png)
 *Figure 1: Sample frames collected by DynaMo showing dynamic shape capture (green) and marker identifaction (gray spheres)*

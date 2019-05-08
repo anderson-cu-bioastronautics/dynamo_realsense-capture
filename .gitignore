@@ -11,3 +11,5 @@ dataStore
 dataTest
 *.cal
 *.png
+.ipynb_checkpoints
+build

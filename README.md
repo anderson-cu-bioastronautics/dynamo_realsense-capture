@@ -109,7 +109,7 @@ This package contains code derived from Intel's librealsense Python box_dimensio
 Modifications to this code are denoted in the source files.
 See LICENSE-librealsense for the license pertaining to librealsense code. 
 
-This package also redistributes ``calculate_rmsd.py`` from the [rmsd] (https://github.com/charnley/rmsd) library. 
+This package also redistributes ``calculate_rmsd.py`` from the [rmsd](https://github.com/charnley/rmsd) library. 
 See LICENSE-rmsd for the license pertaining to ``calculate_rmsd.py``.
 
 
