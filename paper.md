@@ -15,7 +15,8 @@ authors:
 affiliations:
     - name: Ann and H.J. Smead Department of Aerospace Engineering Sciences, University of Colorado Boulder
     - index: 1
-date: 
+date: 8 May 2019
+bibliography: paper.bib
 
 ---
 
