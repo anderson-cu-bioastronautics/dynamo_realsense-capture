@@ -9,7 +9,7 @@ import os
 import pptk
 import numpy as np
 
-cameraFiles = os.listdir('dynamo/sample_files')
+cameraFiles = os.listdir(os.path.join(os.path.dirname(os.getcwd()),'sample_files'))
 
 config = rs.config()
 config.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 30)
@@ -17,7 +17,7 @@ config.enable_stream(rs.stream.color, 1280, 720, rs.format.rgb8, 30)
 deviceManager = DeviceManager(rs.context(), config)
 
 for camera in cameraFiles:
-    deviceManager.enable_device_from_file('dynamo/sample_files/'+camera)
+    deviceManager.enable_device_from_file(os.path.join(os.path.dirname(os.getcwd()),'sample_files',camera))
 
 
 chessboardHeight = 4
