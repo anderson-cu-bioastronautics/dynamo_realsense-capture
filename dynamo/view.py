@@ -3,9 +3,11 @@
 ##########################################################################################################################################
 
 import pickle
-
-import pcl
-import pcl.pcl_visualization
+try:
+    import pcl
+    import pcl.pcl_visualization
+except:
+    pass
 import time
 import numpy as np
 import multiprocessing
