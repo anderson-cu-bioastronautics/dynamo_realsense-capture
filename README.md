@@ -63,7 +63,13 @@ Since the Python wrapper for PCL's installation is highly dependent on your syst
 ## Recommended Installation
 
 We recommend using the Anaconda Package Manager to setup a Python 3.6.5 environment to use this package. 
-If you wish to setup a new environment, an Anaconda [environment](environment.yml) file is included to automatically install most dependencies. Once the environment is setup, you may install pyrealsense2 by using `pip install pyrealsense2`. 
+If you wish to setup a new environment, an Anaconda [environment](environment.yml) file is included to automatically install most dependencies.
+To setup a new environment for DynaMo, type the following command into either a terminal or the Anaconda prompt:
+```
+conda env create  -f=/path/to/environment.yml -n dynamo-env
+```
+This will create a new environment named `dynamo-env`, which can be activated by typing `conda activate dynamo-env`.  
+Once the environment is setup and activated, pyrealsense2 can be installed by using `pip install pyrealsense2`. 
 
 An optional dependency is [`pptk`](https://github.com/heremaps/pptk), which is used to view sample data, tutorial, and to test installation. 
 `pptk` can be installed by using `pip install pptk`. 
@@ -95,11 +101,17 @@ See this [notebook](tutorial.ipynb) for an explanation of the processes used in 
 
 ## Testing
 
-The package includes a script which tests the installation of the `Dyanamo` package. 
-After downloading the `Dynamo` package, run `python testscript.py` inside the [`sample_scripts`](sample_scripts) folder to view a sample scene using the `Dynamo` package.
+The package includes a script which tests the installation of the `DynaMo` package. 
+After downloading the `DynaMo` package, run `python testscript.py` inside the [`sample_scripts`](sample_scripts) folder to view a sample scene using the `DynaMo` package.
 
 Please note, you will require the `pptk` package to view the scene.
 
+## Contributing
+
+To report an issue or problem with DynaMo, please create a new [issue](https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture/issues). 
+You may also contact [abhishektha](https://github.com/abhishektha) with any support or general questions about DynaMo. 
+We also welcome any meaningful contributions to DynaMo. 
+If you have code you would like to contribute, please create a [pull request](https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture/pulls) to submit your code. 
 
 ## License
 
