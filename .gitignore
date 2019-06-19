@@ -10,6 +10,7 @@ __pycache__
 dataStore
 dataTest
 *.cal
-*.png
+.png
 .ipynb_checkpoints
 build
+calTest.py

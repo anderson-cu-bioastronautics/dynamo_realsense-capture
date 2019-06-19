@@ -22,7 +22,7 @@ bibliography: paper.bib
 
 # Background 
 
-Human body shape has been previously captured with a variety of methodologies, including laser lines, structured light, photogrammetry, and millimeter waves [@Daanen:2013]. 
+Human body shape has been previously captured with a variety of methodologies, including laser lines, structured light, photogrammetry, and millimeter waves [@Dannen:2013].
 However these technologies require expensive modules and have limited ability to capture dynamic changes in body shape. 
 
 Similarly, motion capture with specific markers is commonly done through camera-based motion tracking [@Windolf:2008]
@@ -33,6 +33,9 @@ Purchasing a set of these cameras is much more affordable than buying a dedicate
 
 While Intel provides the [``librealsense``](https://github.com/IntelRealSense/librealsense)  library to interface with their cameras, tools are not provided to use multiple devices at once to capture shape and marker-tracking information.
 ``DynaMo`` builds upon [``librealsense``](https://github.com/IntelRealSense/librealsense) to provide additional capability for researchers looking to capture such data.
+
+``DynaMo`` is designed to primarily assist those in the biomechanics and medical field in capturing motion capture or body shape data. 
+It is currently being used in the Anderson Bioastronautics Research Group to capture dynamic changes in foot morphology. 
 
 ![Sample Frames of DynaMo](documentation/sampleFrames.png)
 *Figure 1: Sample frames collected by DynaMo showing dynamic shape capture (green) and marker identifaction (gray spheres)*
@@ -85,7 +88,7 @@ The rotation matrix is horizontally stacked to the translation matrix, and a row
 This matrix transformations each camera's pointcloud from its local coordinate system to a global coordinate system:
 
 Streaming is achieved by reading frames from each camera into a dictionary object saved in the computer's RAM. 
-``DynaMo`` checks frame numbers for continuity to ensure that frames are collected synchroniously and are not repeated. 
+``DynaMo`` checks frame numbers for continuity to ensure that frames are collected synchronously and are not repeated. 
 Once streaming is complete, ``DynaMo`` aligns the images collected by the sensors in each camera to a common image center and saves the images as ``pickle`` objects to the disk. 
 The data from all cameras can then be viewed as a single pointcloud for each frame from all cameras by using the previously computed transformation matrix.
 
@@ -94,8 +97,6 @@ Contours are then drawn each cluster of pixels on each camera's infrared frame; 
 The center of each cluster is calculated and then translated into a 3D point using the depth frame. 
 Next, all points from all cameras are translated into a global coordinate system using the previously computed transformation matrix, and clusters are scanned for duplicates seen from multiple cameras. 
 
-``DynaMo`` is designed to primarily assist those in the biomechanics and medical field in capturing motion capture or body shape data. 
-It is currently being used in the Anderson Bioastronautics Research Group to capture dynamic changes in foot morphology. 
 
 # Acknowledgments
 This work was supported by a National Science Foundation Graduate Research under grant DGE 1650115. The authors would like to thank Dr. Rodger Kram and Dr. Wouter Hoogkamer for the use of their laboratory space for development and testing of the package. 
