@@ -80,15 +80,15 @@ Once you have your Python environment and dependencies setup, clone or download 
 
 The package contains the following functions
 
-[realsense_device_manager.py](realsense_device_manager.py) - Contains `Device Manager` Class which is used to manage and communicate with the connected RealSense devices. 
+[realsense_device_manager.py](dynamo/realsense_device_manager.py) - Contains `Device Manager` Class which is used to manage and communicate with the connected RealSense devices. 
 
-[calibration.py](calibration.py) - Calibrates connected RealSense devices with a template chessboard to a single global coordinate system
+[calibration.py](dynamo/calibration.py) - Calibrates connected RealSense devices with a template chessboard to a single global coordinate system
 
-[stream.py](stream.py) - Allows for the saving of frames from connected RealSense devices to disk  
+[stream.py](dynamo/stream.py) - Allows for the saving of frames from connected RealSense devices to disk  
 
-[view.py](view.py) - Provides pointcloud viewing of the saved frames from disk
+[view.py](dynamo/view.py) - Provides pointcloud viewing of the saved frames from disk
 
-[marker_tracker.py](marker_tracker.py) - Saves global marker locations to disk. 
+[marker_tracker.py](dynamo/marker_tracker.py) - Saves global marker locations to disk. 
 
 
 
