@@ -79,6 +79,8 @@ def depthFrametoPC(deviceData, **kwargs):
     points3x4 = np.vstack((points, np.ones((1,points.shape[1])))) #append 1s to the list of points so that we can multiply by a 4x4 matrix
     pointsTransformed = np.matmul(poseMat, points3x4) #muliply by 4x4 transformation matrix
     pointsTransformed = np.true_divide(pointsTransformed[:3,:], pointsTransformed[[-1], :])
+    kwargs = {}
+    kwargs['format'] = 'pcl'
     if not kwargs['format'] or kwargs['format'] == 'pcl':
         pointCloud = np.asanyarray([pointsTransformed[0,:],pointsTransformed[1,:],pointsTransformed[2,:],rgbPC]).T #append column of point colors to transformed points
     elif kwargs['format'] ==  'rgb':
@@ -103,7 +105,7 @@ def getPointCloud(frame):
     p = multiprocessing.Pool(6) #create a multiprocessing pool to efficiently create pointclouds in parallel
     signal.signal(signal.SIGINT, signalHandler)
     listP = [data for serial, data in frame.items()]
-    cameraPoints = p.map(depthFrametoPC, listP) #process point cloud for each camera in a separate thread
+    cameraPoints = p.map(depthFrametoPC, listP, format='pcl') #process point cloud for each camera in a separate thread
     pointCloud = np.empty((0,4))
     for camera in cameraPoints:
         pointCloud = np.append(pointCloud, camera, axis=0)

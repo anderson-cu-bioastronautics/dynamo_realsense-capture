@@ -18,7 +18,13 @@ from .calculate_rmsd import *
 
 
 
-
+def invTrans(matrix):
+    invRot = np.eye(4)
+    invRot[0:3,0:3] = matrix[0:3,0:3].T
+    invTrans = np.eye(4)
+    invTrans[0:3,3] = -matrix[0:3,3]
+    invMatrix = np.matmul(invRot,invTrans)
+    return invMatrix
 
 def load(fileName):
     """ 
@@ -84,8 +90,78 @@ def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSqu
     file.close()
     return devicesTransformations
 
+def newIterative(fileName,deviceManager, cameraList, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    """ 
+    New calibration parameters for each connected camera and are created and saved in a pickle file format.
+    Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
 
-def detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    Parameters
+    ----------
+    fileName : str
+        Filename to store calibration parameters.
+    
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    cameraList : list
+        list of serial numbers to calibrate cameras in order
+    
+    chessboardHeight : int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth : int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize : float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    deviceTransformations : dict
+        dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera
+
+    Example
+    -----
+        new('savedCalibration.cal')
+    """
+
+    deviceManager.enable_all_devices()
+    file = open(fileName,'wb')        
+
+    deviceTransformations = {}
+    cameraSets = []
+    for cam in range(0,len(cameraList)-1):
+        cameraSets.extend([[cameraList[cam], cameraList[cam+1]]])
+
+    time.sleep(1) #let autoexposure on cameras stabilize over one second 
+
+    for cset in cameraSets:
+        fstring = "Now calibrating cameras {0} and {1}. Press ENTER to start".format(cset[0],cset[1])
+        input(fstring)
+        setTransformations = {}
+        chessboardLocations = detectChessboard(deviceManager, cset, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
+        setTransformations = poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize) #return dictionary of cameras' transformtion matrices
+        deviceTransformations[cset[0]] = setTransformations[cset[0]]
+        deviceTransformations[cset[1]] = setTransformations[cset[1]]
+        deviceTransformations[cset[0]][0] = np.matmul(invTrans(setTransformations[cset[1]][0]),setTransformations[cset[0]][0])
+        #deviceTransformations[cset[1]][0] = np.eye(4)
+        fstring = "Cameras {0} and {1} calibrated. Press ENTER to continue".format(cset[0],cset[1])
+        input(fstring)
+
+    for c,cam in enumerate(cameraList):    
+        if c < len(cameraList):
+            matrices = []
+            for cm in range(c+1,len(cameraList)):
+                deviceTransformations[cam][0] = np.matmul(deviceTransformations[cameraList[cm]][0],deviceTransformations[cameraList[c]][0])
+                print(str(c)+':'+str(cm))
+            #deviceTransformations[cameraList[c]][0] = np.matmul(deviceTransformations[cameraList[1]][0],deviceTransformations[cameraList[0]][0])
+    print(deviceTransformations)
+    pickle.dump(deviceTransformations, file)
+    file.close()
+    return deviceTransformations
+
+
+def detectChessboard(deviceManager, cameraSet, chessboardHeight, chessboardWidth, chessboardSquareSize):
     """ 
     Chessboard locations are computed for each connected RealSense camera
 
@@ -93,6 +169,9 @@ def detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboar
     ----------
     deviceManager : DeviceManager object
         realsense_device_manager object which manages connections to all cameras
+
+    cameraSet : list
+        list of camera serial numbers to detect the chessboard
     
     chessboardHeight: int
         Number of chessboard intersections defining height of target chessboard
@@ -115,12 +194,12 @@ def detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboar
     chessboardDeviceCount = 0
     devicesChessboardLocations = {}
 
-    while len(devicesChessboardLocations) < len(deviceManager._enabled_devices): #iterate through detecting chessboard until all available devices see chessboard
+    while len(devicesChessboardLocations) < len(cameraSet): #iterate through detecting chessboard until all available devices see chessboard
         cameraFrames = deviceManager.poll_frames()
         devicesIntrinsics = deviceManager.get_device_intrinsics(cameraFrames)
         
         for device, frames in cameraFrames.items(): #this will iterate through each device's serial number (which are used as keys in the frames object)
-            if not device in devicesChessboardLocations: #if the camera has not already detected the chessboard
+            if not device in devicesChessboardLocations and device in cameraSet: #if the camera has not already detected the chessboard
 
                 align = rs.align(rs.stream.depth) #align the color sensor to the depth sensor using the factory extrinsics
                 alignedFrames = align.process(frames)
@@ -161,6 +240,7 @@ def detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboar
                     chessboardDeviceCount += 1
 
                 if not chessboardFound: #if the camera doesn't see the chessboard
+                    devicesChessboardLocations = {}
                     #chessboardDeviceCount = 0
                     cv2.imshow(device,bwImage)
                     cv2.waitKey(50)

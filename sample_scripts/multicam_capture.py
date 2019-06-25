@@ -28,7 +28,7 @@ if __name__=="__main__":
     parser.add_argument("--load", help="load calibration",
                         nargs='?')
     parser.add_argument("--new", help="new calibration",
-                        nargs='?',default='new')
+                        nargs='?',default="new.cal")
 
     parser.add_argument("--folder", help="data folder",
                         nargs = '?', default="data")
@@ -38,7 +38,12 @@ if __name__=="__main__":
 
     rsConfig = rs.config()
     if args.load:
-        transformation = calibration.load(args.load)
+        print(os.path.join(os.getcwd(),args.load))
+        file = open(os.path.join(os.getcwd(),args.load),'rb')
+        transformation = pickle.load(file)
+        file.close()
+        #transformation = calibration.load(os.path.join(os.getcwd(),args.load))
+        print(transformation)
         deviceManager = DeviceManager(rs.context(), rsConfig)
         deviceManager.enable_all_emitters()
     elif args.new:
@@ -51,7 +56,14 @@ if __name__=="__main__":
         deviceManager = DeviceManager(rs.context(), rsConfig)
         deviceManager.enable_all_emitters()
         deviceManager.load_settings_json('calibrationSettings.json')
-        transformation = calibration.new(args.new,deviceManager, 4,5,0.0762)
+        cameraOrder = [
+                        '822512060522', 
+                        '823112060874',
+                        '823112060112',
+                        '822512060553', 
+                        '822512060853', 
+                        '822512061105']
+        transformation = calibration.newIterative(args.new,deviceManager, cameraOrder, 4,5,0.0762)
         deviceManager.disable_all_devices()
         rsConfig.disable_stream(rs.stream.depth)
         rsConfig.disable_stream(rs.stream.color)
@@ -63,7 +75,7 @@ if __name__=="__main__":
     rsConfig.enable_stream(rs.stream.depth, resolutionWidth, resolutionHeight, rs.format.z16, frameRate)
     rsConfig.enable_stream(rs.stream.infrared, 1, resolutionWidth, resolutionHeight, rs.format.y8, frameRate)
     
-    deviceManager.load_settings_json('captureSettings.json')
+    deviceManager.load_settings_json('markerSettings.json')
     deviceManager.enable_all_devices()
     
     input("Calibration complete, press Enter to continue...")
@@ -72,14 +84,13 @@ if __name__=="__main__":
     scriptDir = os.path.split(script_path)[0]
 
     if not os.path.isdir(os.path.join(os.getcwd(), args.folder)):
-        os.mkdir(folder) #make base folder if it doesn't exist already
+        os.mkdir(args.folder) #make base folder if it doesn't exist already
     iteration = 1
     while True:
         loc = args.folder+'\\'+str(format(iteration, '02d'))
         saveDirectory = os.path.join(os.getcwd(), loc)
         if not os.path.isdir(saveDirectory):
-            os.mkdir(folder+'\\'+str(format(iteration, '02d'))) #make iteration folder if it doesn't exist already 
-        time.sleep(6)
+            os.mkdir(args.folder+'\\'+str(format(iteration, '02d'))) #make iteration folder if it doesn't exist already 
         data = stream.start(deviceManager, transformation, saveDirectory,args.time)
         input("Data Collection complete, press Enter to continue...")
         
