@@ -30,7 +30,9 @@ def find_in_view(deviceData):
     markers : (n,3) array
         Array with rows representing each marker with columns denoting x,y,z locations
     """
-    depth = deviceData['depth']
+    depthFrame = deviceData['depth']
+    cameraIntrinsics = deviceData['intrinsics']
+    poseMat = deviceData['poseMat']
     if 'infrared' in deviceData: #if infrared frame was saved in frame
         infrared = deviceData['infrared']
     elif 'color' in deviceData: #else convert color frame to black and white
@@ -41,7 +43,7 @@ def find_in_view(deviceData):
         sys.exit()
     
     markerPoints = np.empty((0,3))
-    res,infraredFrameT = cv2.threshold(infraredFrame,150,255,0) #threshold frame to only get bright markers
+    res,infraredFrameT = cv2.threshold(infrared,150,255,0) #threshold frame to only get bright markers
     contours,heirarchy = cv2.findContours(infraredFrameT,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE) #identify bright markers as contours
 
     for cnt in contours: #for each contour
@@ -76,7 +78,7 @@ def detect(frame):
     detectedMarkers = np.empty((0,3))
 
     for device in frame:
-        deviceMarkers = find_in_view(device)
+        deviceMarkers = find_in_view(frame[device])
         detectedMarkers = np.append(detectedMarkers, deviceMarkers, axis=0)
 
     for i in range(0,6): #iterate 6 times
@@ -94,3 +96,5 @@ def detect(frame):
             detectedMarkers = clusteredMarkers
     
     return detectedMarkers
+
+        
