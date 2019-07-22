@@ -76,7 +76,9 @@ An optional dependency is [`pptk`](https://github.com/heremaps/pptk), which is u
 
 Once you have your Python environment and dependencies setup, clone or download this repository and then run ``python setup.py install`` to install the package into your environment.
 
-## Included Functions
+## How to use DynaMo
+
+### Included Functions
 
 The package contains the following functions
 
@@ -90,16 +92,18 @@ The package contains the following functions
 
 [marker_tracker.py](dynamo/marker_tracker.py) - Saves global marker locations to disk. 
 
+### API Documentation
+
+Please refer to the  [API Documentation](documentation/api.md) for details on how to use the included functions. 
 
 
+### Examples
 
-## Examples
-
-See [examples](examples/examples.md) for tutorials on how to use this package.
+The [examples](examples/examples.md) pages includes tutorials on how to use this package.
 
 See this [notebook](tutorial.ipynb) for an explanation of the processes used in the included functions. 
 
-## Testing
+### Testing
 
 The package includes a script which tests the installation of the `DynaMo` package. 
 After downloading the `DynaMo` package, run `python testscript.py` inside the [`sample_scripts`](sample_scripts) folder to view a sample scene using the `DynaMo` package.
