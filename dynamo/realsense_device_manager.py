@@ -5,12 +5,31 @@
 ## https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/examples/box_dimensioner_multicam/realsense_device_manager.py ##
 ## Modified functions are denoted with *Modified* and new functions are denoted with *New*                                                  ##
 ##############################################################################################################################################
+__doc__ = \
+"""
+Class for managing Intel RealSense Devices
+This code has been appended to and modified from the librealsense box_dimensioner_multicam example:                                      
+https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/examples/box_dimensioner_multicam/realsense_device_manager.py 
 
+Modified functions are denoted with *Modified* and new functions are denoted with *New*               
+
+Distributed as a module of DynaMo: https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture
+"""
 import pyrealsense2 as rs
 
 
 class Device:
     def __init__(self, pipeline, pipeline_profile):
+        """
+        Class to manage each Intel RealSense D4XX Device
+
+        Parameters
+        ----------
+        pipeline : rs.pipeline() object
+
+        pipeline_profile : enabled rs.pipeline() object
+
+        """
         self.pipeline = pipeline
         self.pipeline_profile = pipeline_profile
 
@@ -19,12 +38,12 @@ def enumerate_connected_devices(context):
     """
     Enumerate the connected Intel RealSense devices
 
-    Parameters:
+    Parameters
     -----------
-    context 	 	  : rs.context()
+    context : rs.context()
         The context created for using the realsense library
 
-    Return:
+    Return
     -----------
     connect_device : array
         Array of enumerated devices which are connected to the PC
@@ -37,27 +56,32 @@ def enumerate_connected_devices(context):
     return connect_device
 
 
-def post_process_depth_frame(depth_frame, decimation_magnitude=1.0, spatial_magnitude=2.0, spatial_smooth_alpha=0.5,
-    spatial_smooth_delta=20, temporal_smooth_alpha=0.4, temporal_smooth_delta=20):
+def post_process_depth_frame(depth_frame, decimation_magnitude=1.0, spatial_magnitude=2.0, spatial_smooth_alpha=0.5, spatial_smooth_delta=20, temporal_smooth_alpha=0.4, temporal_smooth_delta=20):
     """
     Filter the depth frame acquired using the Intel RealSense device
 
-    Parameters:
+    Parameters
     -----------
-    depth_frame 	 	 	 : rs.frame()
+    depth_frame : rs.frame()
         The depth frame to be post-processed
+
     decimation_magnitude : double
         The magnitude of the decimation filter
-    spatial_magnitude 	 : double
-                            The magnitude of the spatial filter
-    spatial_smooth_alpha	 : double
-                            The alpha value for spatial filter based smoothening
-    spatial_smooth_delta	 : double
-                            The delta value for spatial filter based smoothening
+
+    spatial_magnitude : double
+        The magnitude of the spatial filter
+
+    spatial_smooth_alpha : double
+        The alpha value for spatial filter based smoothening
+
+    spatial_smooth_delta : double
+        The delta value for spatial filter based smoothening
+
     temporal_smooth_alpha : double
-                            The alpha value for temporal filter based smoothening
+        The alpha value for temporal filter based smoothening
+
     temporal_smooth_delta : double
-                            The delta value for temporal filter based smoothening
+        The delta value for temporal filter based smoothening
 
 
     Return:
@@ -98,11 +122,11 @@ def post_process_depth_frame(depth_frame, decimation_magnitude=1.0, spatial_magn
 class DeviceManager:
     def __init__(self, context, pipeline_configuration):
         """
-        Class to manage the Intel RealSense devices
+        Class to manage all connected Intel RealSense devices
 
-        Parameters:
+        Parameters
         -----------
-        context 	: rs.context()
+        context : rs.context()
             The context created for using the realsense library
 
         pipeline_configuration 	: rs.config()
@@ -122,9 +146,9 @@ class DeviceManager:
         """
         Enable an Intel RealSense Device
 
-        Parameters:
+        Parameters
         -----------
-        device_serial 	 : string
+        device_serial : string
             Serial number of the realsense device
 
         enable_ir_emitter : bool
@@ -157,7 +181,7 @@ class DeviceManager:
         """
         Enable all the Intel RealSense Devices which are connected to the PC
 
-        Parameters:
+        Parameters
         -----------
         enable_ir_emitter : bool
             Enable/Disable the IR-Emitter of the device
@@ -173,7 +197,7 @@ class DeviceManager:
         *New*
         Enable a device from a .bag file
 
-        Parameters:
+        Parameters
         -----------
         file : str
             Filepath of .bag file from which to load a device
@@ -204,8 +228,15 @@ class DeviceManager:
         """
         *Modified*
         Load the settings stored in the JSON file
+
         This function is modified to obtain device from rs.context() and not from enabled devices
+
         Run before enabling devices to avoid bugs
+
+        Parameters
+        ----------
+        path_to_settings_file : str
+            Path to JSON settings file for all cameras
 
         """
 
@@ -225,7 +256,7 @@ class DeviceManager:
         Poll for frames from the enabled Intel RealSense devices.
         This function is modified to return frame objects which are of their inherent format from the pyrealsense2 libray.
 
-        Returns:
+        Returns
         --------
 
         frameCollection : dict
@@ -247,8 +278,8 @@ class DeviceManager:
         """ 
         Returns width and height of the depth stream for one arbitrary device
 
-        Returns:
-        -----------
+        Returns
+        -------
 
         width: int
         height: int
@@ -266,13 +297,13 @@ class DeviceManager:
         """
         Get the intrinsics of the imager using its frame delivered by the realsense device
 
-        Parameters:
+        Parameters
         -----------
         frames : rs::frame
             The frame grabbed from the imager inside the Intel RealSense for which the intrinsic is needed
 
-        Return:
-        -----------
+        Returns
+        ------
         device_intrinsics : dict
             Dictionary with device_intrinsics stored as 
 
@@ -304,13 +335,13 @@ class DeviceManager:
         """
         Get the extrinsics between the depth imager 1 and the color imager using its frame delivered by the realsense device
 
-        Parameters:
+        Parameters
         -----------
         frames : rs::frame
             The frame grabbed from the imager inside the Intel RealSense for which the intrinsic is needed
 
-        Return:
-        -----------
+        Return
+        ------
         device_intrinsics : dict
 
         keys  : serial

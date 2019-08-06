@@ -94,7 +94,7 @@ The package contains the following functions
 
 ### API Documentation
 
-Please refer to the  [API Documentation](documentation/api.md) for details on how to use the included functions. 
+Please refer to the  [API Documentation](https://anderson-cu-bioastronautics.github.io/dynamo_realsense-capture/) for details on how to use the included functions. 
 
 
 ### Examples
