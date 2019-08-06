@@ -1,3 +1,10 @@
+__doc__ = \
+"""
+Calibrate multiple Intel RealSense D4XX cameras to a single global coordinate system using a defined checkerboard
+
+Distributed as a module of DynaMo: https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture
+"""
+
 ##########################################################################################################################################
 ##                             License: Apache 2.0. See LICENSE and LICENSE.librealsense files in root directory.		                ##
 ##########################################################################################################################################
@@ -19,6 +26,19 @@ from .calculate_rmsd import *
 
 
 def invTrans(matrix):
+    """
+    Returns inverse of a transformation matrix
+
+    Parameters
+    ----------
+    matrix : (4,4) array
+        Input transformation matrix
+
+    Returns
+    -------
+    invMatrix : (4,4) array
+        Inverse of input transformation matrix
+    """
     invRot = np.eye(4)
     invRot[0:3,0:3] = matrix[0:3,0:3].T
     invTrans = np.eye(4)
@@ -42,7 +62,7 @@ def load(fileName):
         Keys of camera's serial number holding dictionary of calibration parameters per camera
 
     Example
-    -----
+    -------
     load('savedCalibration.cal')
     """
     file = open(fileName,'rb')
@@ -52,6 +72,9 @@ def load(fileName):
 def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize):
     """ 
     New calibration parameters for each connected camera and are created and saved in a pickle file format.
+    
+    Cameras must be all be viewing the calibration checkerboard. 
+
     Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
 
     Parameters
@@ -93,6 +116,10 @@ def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSqu
 def newIterative(fileName,deviceManager, cameraList, chessboardHeight, chessboardWidth, chessboardSquareSize):
     """ 
     New calibration parameters for each connected camera and are created and saved in a pickle file format.
+
+    Function will iterate through camera list and will search for the checkerboard between each consecutive set of two cameras in cameraList.
+    The user must move the checkerboard between the sets of cameras as the function works through the list. 
+
     Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
 
     Parameters

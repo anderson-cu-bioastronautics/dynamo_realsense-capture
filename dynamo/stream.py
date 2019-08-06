@@ -1,7 +1,11 @@
 ##########################################################################################################################################
 ##                             License: Apache 2.0. See LICENSE file in root directory.		                                            ##
 ##########################################################################################################################################
+"""
+Capture a stream of 3D scans from all connected Intel RealSense D4XX cameras
 
+Distributed as a module of DynaMo: https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture
+"""
 
 import pyrealsense2 as rs
 import pickle

@@ -1,7 +1,12 @@
 ##########################################################################################################################################
 ##                                               License: Apache 2.0. See LICENSE  file in root directory.	         	                ##
 ##########################################################################################################################################
+__doc__ = \
+"""
+Detect locations of infrared markers on the captured 3D scan
 
+Distributed as a module of DynaMo: https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture
+"""
 import numpy as np
 import cv2
 import pickle
