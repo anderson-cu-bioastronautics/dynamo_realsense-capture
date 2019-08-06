@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.3" />
+<title>dynamo.calibration API documentation</title>
+<meta name="description" content="Calibrate multiple Intel RealSense D4XX cameras to a single global coordinate system using a defined checkerboard …" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>dynamo.calibration</code></h1>
+</header>
+<section id="section-intro">
+<p>Calibrate multiple Intel RealSense D4XX cameras to a single global coordinate system using a defined checkerboard</p>
+<p>Distributed as a module of DynaMo: <a href="https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture">https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture</a></p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">__doc__ = \
+&#34;&#34;&#34;
+Calibrate multiple Intel RealSense D4XX cameras to a single global coordinate system using a defined checkerboard
+
+Distributed as a module of DynaMo: https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture
+&#34;&#34;&#34;
+
+##########################################################################################################################################
+##                             License: Apache 2.0. See LICENSE and LICENSE.librealsense files in root directory.                               ##
+##########################################################################################################################################
+## This code was inspired from the librealsense box_dimensioner_multicam example, and may contain certain lines of code from this file: ##
+## (https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/examples/box_dimensioner_multicam/calibration_kabsch.py).##                                          
+##########################################################################################################################################
+
+
+
+import pyrealsense2 as rs 
+import cv2
+import numpy as np
+import time
+import pickle
+
+from .realsense_device_manager import DeviceManager
+from .calculate_rmsd import *
+
+
+
+def invTrans(matrix):
+    &#34;&#34;&#34;
+    Returns inverse of a transformation matrix
+
+    Parameters
+    ----------
+    matrix : (4,4) array
+        Input transformation matrix
+
+    Returns
+    -------
+    invMatrix : (4,4) array
+        Inverse of input transformation matrix
+    &#34;&#34;&#34;
+    invRot = np.eye(4)
+    invRot[0:3,0:3] = matrix[0:3,0:3].T
+    invTrans = np.eye(4)
+    invTrans[0:3,3] = -matrix[0:3,3]
+    invMatrix = np.matmul(invRot,invTrans)
+    return invMatrix
+
+def load(fileName):
+    &#34;&#34;&#34; 
+    Calibration parameters for previously connected cameras are loaded from a pickle file format.
+    Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
+
+    Parameters
+    ----------
+    fileName : str
+        Filename of stored calibration parameters.
+
+    Returns
+    -------
+    devicesTransformation : dict
+        Keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Example
+    -------
+    load(&#39;savedCalibration.cal&#39;)
+    &#34;&#34;&#34;
+    file = open(fileName,&#39;rb&#39;)
+    devicesTransformation = pickle.load(file)
+
+
+def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    New calibration parameters for each connected camera and are created and saved in a pickle file format.
+    
+    Cameras must be all be viewing the calibration checkerboard. 
+
+    Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
+
+    Parameters
+    ----------
+    fileName : str
+        Filename to store calibration parameters.
+    
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+    
+    chessboardHeight : int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth : int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize : float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Example
+    -----
+        new(&#39;savedCalibration.cal&#39;)
+    &#34;&#34;&#34;
+
+    deviceManager.enable_all_devices()
+    file = open(fileName,&#39;wb&#39;)             
+    time.sleep(1) #let autoexposure on cameras stabilize over one second 
+    chessboardLocations = detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
+    devicesTransformations = poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize) #return dictionary of 
+    pickle.dump(devicesTransformations, file)
+    file.close()
+    return devicesTransformations
+
+def newIterative(fileName,deviceManager, cameraList, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    New calibration parameters for each connected camera and are created and saved in a pickle file format.
+
+    Function will iterate through camera list and will search for the checkerboard between each consecutive set of two cameras in cameraList.
+    The user must move the checkerboard between the sets of cameras as the function works through the list. 
+
+    Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
+
+    Parameters
+    ----------
+    fileName : str
+        Filename to store calibration parameters.
+    
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    cameraList : list
+        list of serial numbers to calibrate cameras in order
+    
+    chessboardHeight : int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth : int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize : float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    deviceTransformations : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Example
+    -----
+        new(&#39;savedCalibration.cal&#39;)
+    &#34;&#34;&#34;
+
+    deviceManager.enable_all_devices()
+    file = open(fileName,&#39;wb&#39;)        
+
+    deviceTransformations = {}
+    cameraSets = []
+    for cam in range(0,len(cameraList)-1):
+        cameraSets.extend([[cameraList[cam], cameraList[cam+1]]])
+
+    time.sleep(1) #let autoexposure on cameras stabilize over one second 
+
+    for cset in cameraSets:
+        fstring = &#34;Now calibrating cameras {0} and {1}. Press ENTER to start&#34;.format(cset[0],cset[1])
+        input(fstring)
+        setTransformations = {}
+        chessboardLocations = detectChessboard(deviceManager, cset, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
+        setTransformations = poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize) #return dictionary of cameras&#39; transformtion matrices
+        deviceTransformations[cset[0]] = setTransformations[cset[0]]
+        deviceTransformations[cset[1]] = setTransformations[cset[1]]
+        deviceTransformations[cset[0]][0] = np.matmul(invTrans(setTransformations[cset[1]][0]),setTransformations[cset[0]][0])
+        #deviceTransformations[cset[1]][0] = np.eye(4)
+        fstring = &#34;Cameras {0} and {1} calibrated. Press ENTER to continue&#34;.format(cset[0],cset[1])
+        input(fstring)
+
+    for c,cam in enumerate(cameraList):    
+        if c &lt; len(cameraList):
+            matrices = []
+            for cm in range(c+1,len(cameraList)):
+                deviceTransformations[cam][0] = np.matmul(deviceTransformations[cameraList[cm]][0],deviceTransformations[cameraList[c]][0])
+                print(str(c)+&#39;:&#39;+str(cm))
+            #deviceTransformations[cameraList[c]][0] = np.matmul(deviceTransformations[cameraList[1]][0],deviceTransformations[cameraList[0]][0])
+    print(deviceTransformations)
+    pickle.dump(deviceTransformations, file)
+    file.close()
+    return deviceTransformations
+
+
+def detectChessboard(deviceManager, cameraSet, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    Chessboard locations are computed for each connected RealSense camera
+
+    Parameters
+    ----------
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    cameraSet : list
+        list of camera serial numbers to detect the chessboard
+    
+    chessboardHeight: int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth: int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize: float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    chessboardLocations : dict
+        dictionary with keys of camera&#39;s serial number holding detected corners, local 2D and 3D coordinates of detected corners, and their valid depth points
+
+    Example
+    -----
+        detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize)
+    &#34;&#34;&#34;
+    chessboardDeviceCount = 0
+    devicesChessboardLocations = {}
+
+    while len(devicesChessboardLocations) &lt; len(cameraSet): #iterate through detecting chessboard until all available devices see chessboard
+        cameraFrames = deviceManager.poll_frames()
+        devicesIntrinsics = deviceManager.get_device_intrinsics(cameraFrames)
+        
+        for device, frames in cameraFrames.items(): #this will iterate through each device&#39;s serial number (which are used as keys in the frames object)
+            if not device in devicesChessboardLocations and device in cameraSet: #if the camera has not already detected the chessboard
+
+                align = rs.align(rs.stream.depth) #align the color sensor to the depth sensor using the factory extrinsics
+                alignedFrames = align.process(frames)
+                
+                colorImage = np.asanyarray(alignedFrames.get_color_frame().get_data()) 
+                bwImage = cv2.cvtColor(colorImage,cv2.COLOR_BGR2GRAY) #convert color image to B&amp;W image to use in openCV functions
+
+                depthFrame = alignedFrames.get_depth_frame()
+                depthIntrinsics = devicesIntrinsics[device][rs.stream.depth]  #obtain the depth sensor intrinsic properties
+
+                chessboardFound, corners = cv2.findChessboardCorners(bwImage, (chessboardWidth, chessboardHeight)) #use openCV function to detect chessboard corners
+
+                if chessboardFound: #if the camera sees the chessboard
+                    print(device,&#34; sees the chessboard!&#34;)
+                    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001) #subpix criteria
+                    points2D = cv2.cornerSubPix(bwImage, corners, (11,11), (-1,-1), criteria) #further refine corners of chessboard using sub pixeling
+
+                    cv2.drawChessboardCorners(bwImage, (chessboardWidth, chessboardHeight), points2D, chessboardFound) #draw chessboard corners in white over b&amp;w image for verification
+                    cv2.imshow(device,bwImage) #show the detected chessboard corners on the image
+                    cv2.waitKey(50)
+
+                    points2D = np.transpose(corners, (2,0,1)) 
+                    points3D = np.zeros((3, len(points2D[0]))) #preallocate array to turn 2D chessboard corner points from camera into 3D points 
+                    validPoints = [False] * len(points2D[0])
+
+                    for index in range(len(points2D[0])): #iterate over every corner to find 3D location of chessboard corner
+                        corner = points2D[:,index].flatten()
+                        depth = depthFrame.as_depth_frame().get_distance(round(corner[0]), round(corner[1])) #this gets the depth at the pixel for each corner
+                        if depth != 0 and depth is not None: #if the corner point has a valid depth value from the depth sensor
+                            validPoints[index] = True #sets points which have a depth value as valid
+
+                            #formualtion for finding 3D location of 2d point:
+                            points3D[0, index] = (corner[0]-depthIntrinsics.ppx)/depthIntrinsics.fx*depth 
+                            points3D[1, index] = (corner[1]-depthIntrinsics.ppy)/depthIntrinsics.fy*depth
+                            points3D[2, index] = depth
+
+                    devicesChessboardLocations[device] = corners, points2D, points3D, validPoints #save array for each camera of detected corners, their 2D locations, their 3D locations, and if they have a valid depth value
+                    chessboardDeviceCount += 1
+
+                if not chessboardFound: #if the camera doesn&#39;t see the chessboard
+                    devicesChessboardLocations = {}
+                    #chessboardDeviceCount = 0
+                    cv2.imshow(device,bwImage)
+                    cv2.waitKey(50)
+                    print(device,&#34; cannot detect the chessboard!&#34;)
+
+        time.sleep(1)
+        cv2.destroyAllWindows()
+    return devicesChessboardLocations
+        
+
+
+def poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    Transformation matrices and error are computed for each connected RealSense camera
+
+    Parameters
+    ----------
+    chessboardLocations : dict
+        dictionary with keys of camera&#39;s serial number holding detected corners, local 2D and 3D coordinates of detected corners, and their valid depth points
+
+    chessboardHeight: int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth: int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize: float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    devicesTransformation: dict
+        dictionary with keys of camera&#39;s serial number with each camera&#39;s 4x4 transformation matrix and root-mean squared error
+
+    Example
+    -----
+        poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize)
+    &#34;&#34;&#34;
+    devicesTransformation = {}
+    for (serial, [corners, points2D, points3D, validPoints]) in chessboardLocations.items(): #for every camera which has detected the chessboard
+
+        if len(points2D[0])&lt;5: #check if there are at least 5 points to be able to compute transformation matrix
+            print(serial, &#34; does not have enough points to have a valid depth for calculating the transformatoin&#34;)
+
+        else:
+            chessboardPoints = np.zeros((chessboardWidth*chessboardHeight,3), np.float32) #container for 3d coordinates of chessboard corners in global coordinates of chessboard
+            chessboardPoints[:,:2] = np.mgrid[0:chessboardWidth, 0:chessboardHeight].T.reshape(-1,2)
+            chessboardPoints = chessboardPoints.transpose() * chessboardSquareSize
+            validchessboardPoints = chessboardPoints[:,validPoints].transpose()
+            validobservedchessboardPoints = points3D[:, validPoints].transpose() #take chessboard points which have been detected by depth sensor
+
+            chessboardPointsCentered = validchessboardPoints - centroid(validchessboardPoints) #center global chessboard points so that reference frame is same for every camera
+            observedchessboardCentered = validobservedchessboardPoints - centroid(validobservedchessboardPoints) 
+
+            rotationMatrix = kabsch(chessboardPointsCentered, observedchessboardCentered) #calculate rotation between local coordiante system and global coordinate system
+            rmsdValue = kabsch_rmsd(chessboardPointsCentered, observedchessboardCentered) #calculate error of rotation matrix
+
+            translationVector = centroid(validobservedchessboardPoints) - np.matmul(centroid(validchessboardPoints), rotationMatrix) #calculate translation between local and global coordinate system
+            trans = -np.matmul(rotationMatrix, translationVector.transpose())
+
+            poseMat = np.zeros((4,4)) #build 4x4 transformation matrix
+            poseMat[:3,:3] = rotationMatrix
+            poseMat[:3,3] = trans.flatten()
+            poseMat[3,3] = 1
+            
+            devicesTransformation[serial] = [poseMat, rmsdValue]
+    return devicesTransformation
+
+if __name__ == &#34;__main__&#34;:
+    new(&#39;newCalibration.cal&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="dynamo.calibration.detectChessboard"><code class="name flex">
+<span>def <span class="ident">detectChessboard</span></span>(<span>deviceManager, cameraSet, chessboardHeight, chessboardWidth, chessboardSquareSize)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Chessboard locations are computed for each connected RealSense camera</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>deviceManager</code></strong> :&ensp;<code>DeviceManager</code> <code>object</code></dt>
+<dd>realsense_device_manager object which manages connections to all cameras</dd>
+<dt><strong><code>cameraSet</code></strong> :&ensp;<code>list</code></dt>
+<dd>list of camera serial numbers to detect the chessboard</dd>
+<dt><strong><code>chessboardHeight</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining height of target chessboard</dd>
+<dt><strong><code>chessboardWidth</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining width of target chessboard</dd>
+<dt><strong><code>chessboardSquareSize</code></strong> :&ensp;<code>float</code></dt>
+<dd>Dimension of side of chessboard (m)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>chessboardLocations</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number holding detected corners, local 2D and 3D coordinates of detected corners, and their valid depth points</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code>detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize)
+</code></pre></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def detectChessboard(deviceManager, cameraSet, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    Chessboard locations are computed for each connected RealSense camera
+
+    Parameters
+    ----------
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    cameraSet : list
+        list of camera serial numbers to detect the chessboard
+    
+    chessboardHeight: int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth: int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize: float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    chessboardLocations : dict
+        dictionary with keys of camera&#39;s serial number holding detected corners, local 2D and 3D coordinates of detected corners, and their valid depth points
+
+    Example
+    -----
+        detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize)
+    &#34;&#34;&#34;
+    chessboardDeviceCount = 0
+    devicesChessboardLocations = {}
+
+    while len(devicesChessboardLocations) &lt; len(cameraSet): #iterate through detecting chessboard until all available devices see chessboard
+        cameraFrames = deviceManager.poll_frames()
+        devicesIntrinsics = deviceManager.get_device_intrinsics(cameraFrames)
+        
+        for device, frames in cameraFrames.items(): #this will iterate through each device&#39;s serial number (which are used as keys in the frames object)
+            if not device in devicesChessboardLocations and device in cameraSet: #if the camera has not already detected the chessboard
+
+                align = rs.align(rs.stream.depth) #align the color sensor to the depth sensor using the factory extrinsics
+                alignedFrames = align.process(frames)
+                
+                colorImage = np.asanyarray(alignedFrames.get_color_frame().get_data()) 
+                bwImage = cv2.cvtColor(colorImage,cv2.COLOR_BGR2GRAY) #convert color image to B&amp;W image to use in openCV functions
+
+                depthFrame = alignedFrames.get_depth_frame()
+                depthIntrinsics = devicesIntrinsics[device][rs.stream.depth]  #obtain the depth sensor intrinsic properties
+
+                chessboardFound, corners = cv2.findChessboardCorners(bwImage, (chessboardWidth, chessboardHeight)) #use openCV function to detect chessboard corners
+
+                if chessboardFound: #if the camera sees the chessboard
+                    print(device,&#34; sees the chessboard!&#34;)
+                    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001) #subpix criteria
+                    points2D = cv2.cornerSubPix(bwImage, corners, (11,11), (-1,-1), criteria) #further refine corners of chessboard using sub pixeling
+
+                    cv2.drawChessboardCorners(bwImage, (chessboardWidth, chessboardHeight), points2D, chessboardFound) #draw chessboard corners in white over b&amp;w image for verification
+                    cv2.imshow(device,bwImage) #show the detected chessboard corners on the image
+                    cv2.waitKey(50)
+
+                    points2D = np.transpose(corners, (2,0,1)) 
+                    points3D = np.zeros((3, len(points2D[0]))) #preallocate array to turn 2D chessboard corner points from camera into 3D points 
+                    validPoints = [False] * len(points2D[0])
+
+                    for index in range(len(points2D[0])): #iterate over every corner to find 3D location of chessboard corner
+                        corner = points2D[:,index].flatten()
+                        depth = depthFrame.as_depth_frame().get_distance(round(corner[0]), round(corner[1])) #this gets the depth at the pixel for each corner
+                        if depth != 0 and depth is not None: #if the corner point has a valid depth value from the depth sensor
+                            validPoints[index] = True #sets points which have a depth value as valid
+
+                            #formualtion for finding 3D location of 2d point:
+                            points3D[0, index] = (corner[0]-depthIntrinsics.ppx)/depthIntrinsics.fx*depth 
+                            points3D[1, index] = (corner[1]-depthIntrinsics.ppy)/depthIntrinsics.fy*depth
+                            points3D[2, index] = depth
+
+                    devicesChessboardLocations[device] = corners, points2D, points3D, validPoints #save array for each camera of detected corners, their 2D locations, their 3D locations, and if they have a valid depth value
+                    chessboardDeviceCount += 1
+
+                if not chessboardFound: #if the camera doesn&#39;t see the chessboard
+                    devicesChessboardLocations = {}
+                    #chessboardDeviceCount = 0
+                    cv2.imshow(device,bwImage)
+                    cv2.waitKey(50)
+                    print(device,&#34; cannot detect the chessboard!&#34;)
+
+        time.sleep(1)
+        cv2.destroyAllWindows()
+    return devicesChessboardLocations</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calibration.invTrans"><code class="name flex">
+<span>def <span class="ident">invTrans</span></span>(<span>matrix)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns inverse of a transformation matrix</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>matrix</code></strong> :&ensp;(<code>4</code>,<code>4</code>) <code>array</code></dt>
+<dd>Input transformation matrix</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>invMatrix</code></strong> :&ensp;(<code>4</code>,<code>4</code>) <code>array</code></dt>
+<dd>Inverse of input transformation matrix</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def invTrans(matrix):
+    &#34;&#34;&#34;
+    Returns inverse of a transformation matrix
+
+    Parameters
+    ----------
+    matrix : (4,4) array
+        Input transformation matrix
+
+    Returns
+    -------
+    invMatrix : (4,4) array
+        Inverse of input transformation matrix
+    &#34;&#34;&#34;
+    invRot = np.eye(4)
+    invRot[0:3,0:3] = matrix[0:3,0:3].T
+    invTrans = np.eye(4)
+    invTrans[0:3,3] = -matrix[0:3,3]
+    invMatrix = np.matmul(invRot,invTrans)
+    return invMatrix</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calibration.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>fileName)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Calibration parameters for previously connected cameras are loaded from a pickle file format.
+Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration </p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fileName</code></strong> :&ensp;<code>str</code></dt>
+<dd>Filename of stored calibration parameters.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>devicesTransformation</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Keys of camera's serial number holding dictionary of calibration parameters per camera</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>load('savedCalibration.cal')</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def load(fileName):
+    &#34;&#34;&#34; 
+    Calibration parameters for previously connected cameras are loaded from a pickle file format.
+    Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
+
+    Parameters
+    ----------
+    fileName : str
+        Filename of stored calibration parameters.
+
+    Returns
+    -------
+    devicesTransformation : dict
+        Keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Example
+    -------
+    load(&#39;savedCalibration.cal&#39;)
+    &#34;&#34;&#34;
+    file = open(fileName,&#39;rb&#39;)
+    devicesTransformation = pickle.load(file)</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calibration.new"><code class="name flex">
+<span>def <span class="ident">new</span></span>(<span>fileName, deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>New calibration parameters for each connected camera and are created and saved in a pickle file format.</p>
+<p>Cameras must be all be viewing the calibration checkerboard. </p>
+<p>Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration </p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fileName</code></strong> :&ensp;<code>str</code></dt>
+<dd>Filename to store calibration parameters.</dd>
+<dt><strong><code>deviceManager</code></strong> :&ensp;<code>DeviceManager</code> <code>object</code></dt>
+<dd>realsense_device_manager object which manages connections to all cameras</dd>
+<dt><strong><code>chessboardHeight</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining height of target chessboard</dd>
+<dt><strong><code>chessboardWidth</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining width of target chessboard</dd>
+<dt><strong><code>chessboardSquareSize</code></strong> :&ensp;<code>float</code></dt>
+<dd>Dimension of side of chessboard (m)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>devicesTransformation</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code>new('savedCalibration.cal')
+</code></pre></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    New calibration parameters for each connected camera and are created and saved in a pickle file format.
+    
+    Cameras must be all be viewing the calibration checkerboard. 
+
+    Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
+
+    Parameters
+    ----------
+    fileName : str
+        Filename to store calibration parameters.
+    
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+    
+    chessboardHeight : int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth : int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize : float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Example
+    -----
+        new(&#39;savedCalibration.cal&#39;)
+    &#34;&#34;&#34;
+
+    deviceManager.enable_all_devices()
+    file = open(fileName,&#39;wb&#39;)             
+    time.sleep(1) #let autoexposure on cameras stabilize over one second 
+    chessboardLocations = detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
+    devicesTransformations = poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize) #return dictionary of 
+    pickle.dump(devicesTransformations, file)
+    file.close()
+    return devicesTransformations</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calibration.newIterative"><code class="name flex">
+<span>def <span class="ident">newIterative</span></span>(<span>fileName, deviceManager, cameraList, chessboardHeight, chessboardWidth, chessboardSquareSize)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>New calibration parameters for each connected camera and are created and saved in a pickle file format.</p>
+<p>Function will iterate through camera list and will search for the checkerboard between each consecutive set of two cameras in cameraList.
+The user must move the checkerboard between the sets of cameras as the function works through the list. </p>
+<p>Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration </p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>fileName</code></strong> :&ensp;<code>str</code></dt>
+<dd>Filename to store calibration parameters.</dd>
+<dt><strong><code>deviceManager</code></strong> :&ensp;<code>DeviceManager</code> <code>object</code></dt>
+<dd>realsense_device_manager object which manages connections to all cameras</dd>
+<dt><strong><code>cameraList</code></strong> :&ensp;<code>list</code></dt>
+<dd>list of serial numbers to calibrate cameras in order</dd>
+<dt><strong><code>chessboardHeight</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining height of target chessboard</dd>
+<dt><strong><code>chessboardWidth</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining width of target chessboard</dd>
+<dt><strong><code>chessboardSquareSize</code></strong> :&ensp;<code>float</code></dt>
+<dd>Dimension of side of chessboard (m)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>deviceTransformations</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code>new('savedCalibration.cal')
+</code></pre></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newIterative(fileName,deviceManager, cameraList, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    New calibration parameters for each connected camera and are created and saved in a pickle file format.
+
+    Function will iterate through camera list and will search for the checkerboard between each consecutive set of two cameras in cameraList.
+    The user must move the checkerboard between the sets of cameras as the function works through the list. 
+
+    Calibration parameters for each camera include a 4x4 transformation matrix and rmsd error of calibration 
+
+    Parameters
+    ----------
+    fileName : str
+        Filename to store calibration parameters.
+    
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    cameraList : list
+        list of serial numbers to calibrate cameras in order
+    
+    chessboardHeight : int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth : int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize : float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    deviceTransformations : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Example
+    -----
+        new(&#39;savedCalibration.cal&#39;)
+    &#34;&#34;&#34;
+
+    deviceManager.enable_all_devices()
+    file = open(fileName,&#39;wb&#39;)        
+
+    deviceTransformations = {}
+    cameraSets = []
+    for cam in range(0,len(cameraList)-1):
+        cameraSets.extend([[cameraList[cam], cameraList[cam+1]]])
+
+    time.sleep(1) #let autoexposure on cameras stabilize over one second 
+
+    for cset in cameraSets:
+        fstring = &#34;Now calibrating cameras {0} and {1}. Press ENTER to start&#34;.format(cset[0],cset[1])
+        input(fstring)
+        setTransformations = {}
+        chessboardLocations = detectChessboard(deviceManager, cset, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
+        setTransformations = poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize) #return dictionary of cameras&#39; transformtion matrices
+        deviceTransformations[cset[0]] = setTransformations[cset[0]]
+        deviceTransformations[cset[1]] = setTransformations[cset[1]]
+        deviceTransformations[cset[0]][0] = np.matmul(invTrans(setTransformations[cset[1]][0]),setTransformations[cset[0]][0])
+        #deviceTransformations[cset[1]][0] = np.eye(4)
+        fstring = &#34;Cameras {0} and {1} calibrated. Press ENTER to continue&#34;.format(cset[0],cset[1])
+        input(fstring)
+
+    for c,cam in enumerate(cameraList):    
+        if c &lt; len(cameraList):
+            matrices = []
+            for cm in range(c+1,len(cameraList)):
+                deviceTransformations[cam][0] = np.matmul(deviceTransformations[cameraList[cm]][0],deviceTransformations[cameraList[c]][0])
+                print(str(c)+&#39;:&#39;+str(cm))
+            #deviceTransformations[cameraList[c]][0] = np.matmul(deviceTransformations[cameraList[1]][0],deviceTransformations[cameraList[0]][0])
+    print(deviceTransformations)
+    pickle.dump(deviceTransformations, file)
+    file.close()
+    return deviceTransformations</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calibration.poseTransformation"><code class="name flex">
+<span>def <span class="ident">poseTransformation</span></span>(<span>chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Transformation matrices and error are computed for each connected RealSense camera</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>chessboardLocations</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number holding detected corners, local 2D and 3D coordinates of detected corners, and their valid depth points</dd>
+<dt><strong><code>chessboardHeight</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining height of target chessboard</dd>
+<dt><strong><code>chessboardWidth</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of chessboard intersections defining width of target chessboard</dd>
+<dt><strong><code>chessboardSquareSize</code></strong> :&ensp;<code>float</code></dt>
+<dd>Dimension of side of chessboard (m)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>devicesTransformation</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number with each camera's 4x4 transformation matrix and root-mean squared error</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code>poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize)
+</code></pre></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize):
+    &#34;&#34;&#34; 
+    Transformation matrices and error are computed for each connected RealSense camera
+
+    Parameters
+    ----------
+    chessboardLocations : dict
+        dictionary with keys of camera&#39;s serial number holding detected corners, local 2D and 3D coordinates of detected corners, and their valid depth points
+
+    chessboardHeight: int
+        Number of chessboard intersections defining height of target chessboard
+
+    chessboardWidth: int
+        Number of chessboard intersections defining width of target chessboard
+    
+    chessboardSquareSize: float
+        Dimension of side of chessboard (m)
+
+    Returns
+    -------
+    devicesTransformation: dict
+        dictionary with keys of camera&#39;s serial number with each camera&#39;s 4x4 transformation matrix and root-mean squared error
+
+    Example
+    -----
+        poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize)
+    &#34;&#34;&#34;
+    devicesTransformation = {}
+    for (serial, [corners, points2D, points3D, validPoints]) in chessboardLocations.items(): #for every camera which has detected the chessboard
+
+        if len(points2D[0])&lt;5: #check if there are at least 5 points to be able to compute transformation matrix
+            print(serial, &#34; does not have enough points to have a valid depth for calculating the transformatoin&#34;)
+
+        else:
+            chessboardPoints = np.zeros((chessboardWidth*chessboardHeight,3), np.float32) #container for 3d coordinates of chessboard corners in global coordinates of chessboard
+            chessboardPoints[:,:2] = np.mgrid[0:chessboardWidth, 0:chessboardHeight].T.reshape(-1,2)
+            chessboardPoints = chessboardPoints.transpose() * chessboardSquareSize
+            validchessboardPoints = chessboardPoints[:,validPoints].transpose()
+            validobservedchessboardPoints = points3D[:, validPoints].transpose() #take chessboard points which have been detected by depth sensor
+
+            chessboardPointsCentered = validchessboardPoints - centroid(validchessboardPoints) #center global chessboard points so that reference frame is same for every camera
+            observedchessboardCentered = validobservedchessboardPoints - centroid(validobservedchessboardPoints) 
+
+            rotationMatrix = kabsch(chessboardPointsCentered, observedchessboardCentered) #calculate rotation between local coordiante system and global coordinate system
+            rmsdValue = kabsch_rmsd(chessboardPointsCentered, observedchessboardCentered) #calculate error of rotation matrix
+
+            translationVector = centroid(validobservedchessboardPoints) - np.matmul(centroid(validchessboardPoints), rotationMatrix) #calculate translation between local and global coordinate system
+            trans = -np.matmul(rotationMatrix, translationVector.transpose())
+
+            poseMat = np.zeros((4,4)) #build 4x4 transformation matrix
+            poseMat[:3,:3] = rotationMatrix
+            poseMat[:3,3] = trans.flatten()
+            poseMat[3,3] = 1
+            
+            devicesTransformation[serial] = [poseMat, rmsdValue]
+    return devicesTransformation</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="dynamo" href="index.html">dynamo</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="dynamo.calibration.detectChessboard" href="#dynamo.calibration.detectChessboard">detectChessboard</a></code></li>
+<li><code><a title="dynamo.calibration.invTrans" href="#dynamo.calibration.invTrans">invTrans</a></code></li>
+<li><code><a title="dynamo.calibration.load" href="#dynamo.calibration.load">load</a></code></li>
+<li><code><a title="dynamo.calibration.new" href="#dynamo.calibration.new">new</a></code></li>
+<li><code><a title="dynamo.calibration.newIterative" href="#dynamo.calibration.newIterative">newIterative</a></code></li>
+<li><code><a title="dynamo.calibration.poseTransformation" href="#dynamo.calibration.poseTransformation">poseTransformation</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

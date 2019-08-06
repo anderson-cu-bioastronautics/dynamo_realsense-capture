@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.3" />
+<title>dynamo.stream API documentation</title>
+<meta name="description" content="Capture a stream of 3D scans from all connected Intel RealSense D4XX cameras …" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>dynamo.stream</code></h1>
+</header>
+<section id="section-intro">
+<p>Capture a stream of 3D scans from all connected Intel RealSense D4XX cameras</p>
+<p>Distributed as a module of DynaMo: <a href="https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture">https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture</a></p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">##########################################################################################################################################
+##                             License: Apache 2.0. See LICENSE file in root directory.                                                     ##
+##########################################################################################################################################
+&#34;&#34;&#34;
+Capture a stream of 3D scans from all connected Intel RealSense D4XX cameras
+
+Distributed as a module of DynaMo: https://github.com/anderson-cu-bioastronautics/dynamo_realsense-capture
+&#34;&#34;&#34;
+
+import pyrealsense2 as rs
+import pickle
+import queue
+import threading
+import time
+import os
+import copy
+import numpy as np
+from .view import depthFrametoPC
+
+def captureThread(q,deviceManager,stream_time):
+    &#34;&#34;&#34;
+    Function to capture frames from connected RealSense Cameras to memory
+
+    Parameters
+    ----------
+    q : Queue object
+        Queue for storing captured frames 
+
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    time : float
+        Time in seconds for how long to collect data
+    &#34;&#34;&#34;
+    i=0
+    fnumber = deviceManager.poll_frames()[&#39;822512060853&#39;].get_frame_number() #get frame number to ensure subsequent frames are saved
+    while i&lt;int(90*stream_time):
+        frames = deviceManager.poll_frames()
+        newfnumber = frames[&#39;822512060853&#39;].get_frame_number()
+        if fnumber != newfnumber: #only save if frame has not already been saved
+            q.put(frames)
+            i+=1
+            print(str(newfnumber)+&#39; &#39;+str(i)+&#39;/&#39;+str(int(90*stream_time)))
+        fnumber = newfnumber
+
+
+def processThread(q,devicesTransformation, saveDirectory):
+    &#34;&#34;&#34;
+    Function to process frames from queue to save to disk in pickle format
+
+    Parameters
+    ----------
+    q : Queue object
+        Queue which stores captured frames 
+
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    folder : str
+        Folder name in which to save frames, referenced to current working directory
+
+    iteration : int
+        Iteration of data collection, subsequent iterations will be saved in the folder specified
+
+    &#34;&#34;&#34;
+
+
+    i=0
+    while not q.empty(): #while frames are still waiting to be processed
+        framesAll = q.get()
+        fname = saveDirectory+&#39;\\&#39;+str(format(i, &#39;05d&#39;))+&#39;.pickle&#39;
+        file = open(fname,&#39;wb&#39;)
+        savedData={}
+        for device,frames in framesAll.items():
+            deviceData = {}
+            align = rs.align(rs.stream.depth) #setup rs.align object
+            alignedFrames = align.process(frames) #align frames
+            depthFrame = alignedFrames.get_depth_frame() 
+            rsIntrinsics = depthFrame.get_profile().as_video_stream_profile().get_intrinsics()
+            deviceData[&#39;depth&#39;] = copy.deepcopy(np.asanyarray(depthFrame.get_data())) #save depth frame
+            try:
+                infraredFrame = alignedFrames.get_infrared_frame(1)
+                deviceData[&#39;infrared&#39;] = copy.deepcopy(np.asanyarray(infraredFrame.get_data())) #save infrared frame
+            except:
+                pass
+            try:
+                colorFrame = alignedFrames.get_color_frame()
+                deviceData[&#39;color&#39;] = copy.deepcopy(np.asanyarray(colorFrame.get_data())) #save infrared frame
+            except:
+                pass    
+            deviceData[&#39;intrinsics&#39;] = {&#39;ppx&#39;: rsIntrinsics.ppx, &#39;ppy&#39;:rsIntrinsics.ppy, &#39;fx&#39;:rsIntrinsics.fx, &#39;fy&#39;:rsIntrinsics.fy} #save relevant intrinsics
+            deviceData[&#39;poseMat&#39;] = devicesTransformation[device][0] #save transformation matrix
+            savedData[device]=deviceData #save each camera&#39;s information in master dictionary for frame
+        pickle.dump(copy.deepcopy(savedData),file)
+        print(&#39;processed&#39;+str(i))
+        i+=1
+        file.close()
+        q.task_done()
+    print(&#39;queue finished&#39;)
+
+def single(deviceManager, devicesTransformation):
+    &#34;&#34;&#34;
+    Function to return single, aligned pointcloud from conneted Realsense Cameras
+
+    Parameters
+    ----------
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Returns
+    -------
+    allPoints : (n,6) array
+        array containing list of all points from all connected cameras
+
+    &#34;&#34;&#34;
+    frames = deviceManager.poll_frames()
+    allPoints = np.empty((0,6))
+    for camera,frame in frames.items():
+        deviceData = {}
+        align = rs.align(rs.stream.depth) #setup rs.align object
+        alignedFrames = align.process(frame) #align frames
+        depthFrame = alignedFrames.get_depth_frame() 
+        rsIntrinsics = depthFrame.get_profile().as_video_stream_profile().get_intrinsics()
+        deviceData[&#39;depth&#39;] = copy.deepcopy(np.asanyarray(depthFrame.get_data())) #save depth frame
+        try:
+            infraredFrame = alignedFrames.get_infrared_frame(1)
+            deviceData[&#39;infrared&#39;] = copy.deepcopy(np.asanyarray(infraredFrame.get_data())) #save infrared frame
+        except:
+            pass
+        try:
+            colorFrame = alignedFrames.get_color_frame()
+            deviceData[&#39;color&#39;] = copy.deepcopy(np.asanyarray(colorFrame.get_data())) #save infrared frame
+        except:
+            pass    
+        deviceData[&#39;intrinsics&#39;] = {&#39;ppx&#39;: rsIntrinsics.ppx, &#39;ppy&#39;:rsIntrinsics.ppy, &#39;fx&#39;:rsIntrinsics.fx, &#39;fy&#39;:rsIntrinsics.fy} #save relevant intrinsics
+        deviceData[&#39;poseMat&#39;] = devicesTransformation[camera][0] #save transformation matrix
+        points = depthFrametoPC(deviceData, format=&#39;rgb&#39;)
+        allPoints = np.append(allPoints, points, axis=0)
+    return allPoints
+
+def start(deviceManager, deviceTransformations, saveDirectory, stream_time):
+    &#34;&#34;&#34;
+    Function to save aligned frames from connected RealSense Cameras to disk for future processing
+
+    Parameters
+    ----------
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    folder : str
+        Folder name in which to save frames, referenced to current working directory
+
+    iteration : int
+        Iteration of data collection, subsequent iterations will be saved in the folder specified
+
+    time : float
+        Time in seconds for how long to collect data
+    &#34;&#34;&#34;
+    q = queue.Queue(maxsize=0) #queue object to hold incoming frames
+    capture = threading.Thread(target=captureThread,args=(q,deviceManager,int(stream_time))) #thread which will capture frames
+    process = threading.Thread(target=processThread,args=(q,deviceTransformations,saveDirectory)) #thread which will save frames to disk
+
+    capture.start()
+    capture.join()
+    time.sleep(int(stream_time)+1) #delay to allow capture thread to finish, this may or may not be needed based on hardware specifications but is recommended to reduce dropped frames
+    process.start()
+    process.join()
+    q.join()
+    
+
+
+
+
+
+    </code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="dynamo.stream.captureThread"><code class="name flex">
+<span>def <span class="ident">captureThread</span></span>(<span>q, deviceManager, stream_time)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Function to capture frames from connected RealSense Cameras to memory</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>q</code></strong> :&ensp;<code>Queue</code> <code>object</code></dt>
+<dd>Queue for storing captured frames</dd>
+<dt><strong><code>deviceManager</code></strong> :&ensp;<code>DeviceManager</code> <code>object</code></dt>
+<dd>realsense_device_manager object which manages connections to all cameras</dd>
+<dt><strong><code>time</code></strong> :&ensp;<code>float</code></dt>
+<dd>Time in seconds for how long to collect data</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def captureThread(q,deviceManager,stream_time):
+    &#34;&#34;&#34;
+    Function to capture frames from connected RealSense Cameras to memory
+
+    Parameters
+    ----------
+    q : Queue object
+        Queue for storing captured frames 
+
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    time : float
+        Time in seconds for how long to collect data
+    &#34;&#34;&#34;
+    i=0
+    fnumber = deviceManager.poll_frames()[&#39;822512060853&#39;].get_frame_number() #get frame number to ensure subsequent frames are saved
+    while i&lt;int(90*stream_time):
+        frames = deviceManager.poll_frames()
+        newfnumber = frames[&#39;822512060853&#39;].get_frame_number()
+        if fnumber != newfnumber: #only save if frame has not already been saved
+            q.put(frames)
+            i+=1
+            print(str(newfnumber)+&#39; &#39;+str(i)+&#39;/&#39;+str(int(90*stream_time)))
+        fnumber = newfnumber</code></pre>
+</details>
+</dd>
+<dt id="dynamo.stream.processThread"><code class="name flex">
+<span>def <span class="ident">processThread</span></span>(<span>q, devicesTransformation, saveDirectory)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Function to process frames from queue to save to disk in pickle format</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>q</code></strong> :&ensp;<code>Queue</code> <code>object</code></dt>
+<dd>Queue which stores captured frames</dd>
+<dt><strong><code>devicesTransformation</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera</dd>
+<dt><strong><code>folder</code></strong> :&ensp;<code>str</code></dt>
+<dd>Folder name in which to save frames, referenced to current working directory</dd>
+<dt><strong><code>iteration</code></strong> :&ensp;<code>int</code></dt>
+<dd>Iteration of data collection, subsequent iterations will be saved in the folder specified</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def processThread(q,devicesTransformation, saveDirectory):
+    &#34;&#34;&#34;
+    Function to process frames from queue to save to disk in pickle format
+
+    Parameters
+    ----------
+    q : Queue object
+        Queue which stores captured frames 
+
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    folder : str
+        Folder name in which to save frames, referenced to current working directory
+
+    iteration : int
+        Iteration of data collection, subsequent iterations will be saved in the folder specified
+
+    &#34;&#34;&#34;
+
+
+    i=0
+    while not q.empty(): #while frames are still waiting to be processed
+        framesAll = q.get()
+        fname = saveDirectory+&#39;\\&#39;+str(format(i, &#39;05d&#39;))+&#39;.pickle&#39;
+        file = open(fname,&#39;wb&#39;)
+        savedData={}
+        for device,frames in framesAll.items():
+            deviceData = {}
+            align = rs.align(rs.stream.depth) #setup rs.align object
+            alignedFrames = align.process(frames) #align frames
+            depthFrame = alignedFrames.get_depth_frame() 
+            rsIntrinsics = depthFrame.get_profile().as_video_stream_profile().get_intrinsics()
+            deviceData[&#39;depth&#39;] = copy.deepcopy(np.asanyarray(depthFrame.get_data())) #save depth frame
+            try:
+                infraredFrame = alignedFrames.get_infrared_frame(1)
+                deviceData[&#39;infrared&#39;] = copy.deepcopy(np.asanyarray(infraredFrame.get_data())) #save infrared frame
+            except:
+                pass
+            try:
+                colorFrame = alignedFrames.get_color_frame()
+                deviceData[&#39;color&#39;] = copy.deepcopy(np.asanyarray(colorFrame.get_data())) #save infrared frame
+            except:
+                pass    
+            deviceData[&#39;intrinsics&#39;] = {&#39;ppx&#39;: rsIntrinsics.ppx, &#39;ppy&#39;:rsIntrinsics.ppy, &#39;fx&#39;:rsIntrinsics.fx, &#39;fy&#39;:rsIntrinsics.fy} #save relevant intrinsics
+            deviceData[&#39;poseMat&#39;] = devicesTransformation[device][0] #save transformation matrix
+            savedData[device]=deviceData #save each camera&#39;s information in master dictionary for frame
+        pickle.dump(copy.deepcopy(savedData),file)
+        print(&#39;processed&#39;+str(i))
+        i+=1
+        file.close()
+        q.task_done()
+    print(&#39;queue finished&#39;)</code></pre>
+</details>
+</dd>
+<dt id="dynamo.stream.single"><code class="name flex">
+<span>def <span class="ident">single</span></span>(<span>deviceManager, devicesTransformation)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Function to return single, aligned pointcloud from conneted Realsense Cameras</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>deviceManager</code></strong> :&ensp;<code>DeviceManager</code> <code>object</code></dt>
+<dd>realsense_device_manager object which manages connections to all cameras</dd>
+<dt><strong><code>devicesTransformation</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>allPoints</code></strong> :&ensp;(<code>n</code>,<code>6</code>) <code>array</code></dt>
+<dd>array containing list of all points from all connected cameras</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def single(deviceManager, devicesTransformation):
+    &#34;&#34;&#34;
+    Function to return single, aligned pointcloud from conneted Realsense Cameras
+
+    Parameters
+    ----------
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    Returns
+    -------
+    allPoints : (n,6) array
+        array containing list of all points from all connected cameras
+
+    &#34;&#34;&#34;
+    frames = deviceManager.poll_frames()
+    allPoints = np.empty((0,6))
+    for camera,frame in frames.items():
+        deviceData = {}
+        align = rs.align(rs.stream.depth) #setup rs.align object
+        alignedFrames = align.process(frame) #align frames
+        depthFrame = alignedFrames.get_depth_frame() 
+        rsIntrinsics = depthFrame.get_profile().as_video_stream_profile().get_intrinsics()
+        deviceData[&#39;depth&#39;] = copy.deepcopy(np.asanyarray(depthFrame.get_data())) #save depth frame
+        try:
+            infraredFrame = alignedFrames.get_infrared_frame(1)
+            deviceData[&#39;infrared&#39;] = copy.deepcopy(np.asanyarray(infraredFrame.get_data())) #save infrared frame
+        except:
+            pass
+        try:
+            colorFrame = alignedFrames.get_color_frame()
+            deviceData[&#39;color&#39;] = copy.deepcopy(np.asanyarray(colorFrame.get_data())) #save infrared frame
+        except:
+            pass    
+        deviceData[&#39;intrinsics&#39;] = {&#39;ppx&#39;: rsIntrinsics.ppx, &#39;ppy&#39;:rsIntrinsics.ppy, &#39;fx&#39;:rsIntrinsics.fx, &#39;fy&#39;:rsIntrinsics.fy} #save relevant intrinsics
+        deviceData[&#39;poseMat&#39;] = devicesTransformation[camera][0] #save transformation matrix
+        points = depthFrametoPC(deviceData, format=&#39;rgb&#39;)
+        allPoints = np.append(allPoints, points, axis=0)
+    return allPoints</code></pre>
+</details>
+</dd>
+<dt id="dynamo.stream.start"><code class="name flex">
+<span>def <span class="ident">start</span></span>(<span>deviceManager, deviceTransformations, saveDirectory, stream_time)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Function to save aligned frames from connected RealSense Cameras to disk for future processing</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>deviceManager</code></strong> :&ensp;<code>DeviceManager</code> <code>object</code></dt>
+<dd>realsense_device_manager object which manages connections to all cameras</dd>
+<dt><strong><code>devicesTransformation</code></strong> :&ensp;<code>dict</code></dt>
+<dd>dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera</dd>
+<dt><strong><code>folder</code></strong> :&ensp;<code>str</code></dt>
+<dd>Folder name in which to save frames, referenced to current working directory</dd>
+<dt><strong><code>iteration</code></strong> :&ensp;<code>int</code></dt>
+<dd>Iteration of data collection, subsequent iterations will be saved in the folder specified</dd>
+<dt><strong><code>time</code></strong> :&ensp;<code>float</code></dt>
+<dd>Time in seconds for how long to collect data</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def start(deviceManager, deviceTransformations, saveDirectory, stream_time):
+    &#34;&#34;&#34;
+    Function to save aligned frames from connected RealSense Cameras to disk for future processing
+
+    Parameters
+    ----------
+    deviceManager : DeviceManager object
+        realsense_device_manager object which manages connections to all cameras
+
+    devicesTransformation : dict
+        dictionary with keys of camera&#39;s serial number holding dictionary of calibration parameters per camera
+
+    folder : str
+        Folder name in which to save frames, referenced to current working directory
+
+    iteration : int
+        Iteration of data collection, subsequent iterations will be saved in the folder specified
+
+    time : float
+        Time in seconds for how long to collect data
+    &#34;&#34;&#34;
+    q = queue.Queue(maxsize=0) #queue object to hold incoming frames
+    capture = threading.Thread(target=captureThread,args=(q,deviceManager,int(stream_time))) #thread which will capture frames
+    process = threading.Thread(target=processThread,args=(q,deviceTransformations,saveDirectory)) #thread which will save frames to disk
+
+    capture.start()
+    capture.join()
+    time.sleep(int(stream_time)+1) #delay to allow capture thread to finish, this may or may not be needed based on hardware specifications but is recommended to reduce dropped frames
+    process.start()
+    process.join()
+    q.join()</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="dynamo" href="index.html">dynamo</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="dynamo.stream.captureThread" href="#dynamo.stream.captureThread">captureThread</a></code></li>
+<li><code><a title="dynamo.stream.processThread" href="#dynamo.stream.processThread">processThread</a></code></li>
+<li><code><a title="dynamo.stream.single" href="#dynamo.stream.single">single</a></code></li>
+<li><code><a title="dynamo.stream.start" href="#dynamo.stream.start">start</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

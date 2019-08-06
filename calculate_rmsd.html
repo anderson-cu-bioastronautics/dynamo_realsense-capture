@@ -1,0 +1,2551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.3" />
+<title>dynamo.calculate_rmsd API documentation</title>
+<meta name="description" content="Calculate Root-mean-square deviation (RMSD) between structure A and B, in XYZ
+or PDB format, using transformation and rotation …" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>dynamo.calculate_rmsd</code></h1>
+</header>
+<section id="section-intro">
+<p>Calculate Root-mean-square deviation (RMSD) between structure A and B, in XYZ
+or PDB format, using transformation and rotation.</p>
+<p>For more information, usage, example and citation read more at
+<a href="https://github.com/charnley/rmsd">https://github.com/charnley/rmsd</a></p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">#!/usr/bin/env python
+__doc__ = \
+&#34;&#34;&#34;
+Calculate Root-mean-square deviation (RMSD) between structure A and B, in XYZ
+or PDB format, using transformation and rotation.
+
+For more information, usage, example and citation read more at
+https://github.com/charnley/rmsd
+&#34;&#34;&#34;
+
+__version__ = &#39;1.3.2&#39;
+
+import copy
+import re
+
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+from scipy.spatial.distance import cdist
+
+
+AXIS_SWAPS = np.array([
+    [0, 1, 2],
+    [0, 2, 1],
+    [1, 0, 2],
+    [1, 2, 0],
+    [2, 1, 0],
+    [2, 0, 1]])
+
+AXIS_REFLECTIONS = np.array([
+    [1, 1, 1],
+    [-1, 1, 1],
+    [1, -1, 1],
+    [1, 1, -1],
+    [-1, -1, 1],
+    [-1, 1, -1],
+    [1, -1, -1],
+    [-1, -1, -1]])
+
+
+def rmsd(V, W):
+    &#34;&#34;&#34;
+    Calculate Root-mean-square deviation from two sets of vectors V and W.
+
+    Parameters
+    ----------
+    V : array
+        (N,D) matrix, where N is points and D is dimension.
+    W : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    rmsd : float
+        Root-mean-square deviation between the two vectors
+    &#34;&#34;&#34;
+    D = len(V[0])
+    N = len(V)
+    result = 0.0
+    for v, w in zip(V, W):
+        result += sum([(v[i] - w[i])**2.0 for i in range(D)])
+    return np.sqrt(result/N)
+
+
+def kabsch_rmsd(P, Q, translate=False):
+    &#34;&#34;&#34;
+    Rotate matrix P unto Q using Kabsch algorithm and calculate the RMSD.
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+    translate : bool
+        Use centroids to translate vector P and Q unto each other.
+
+    Returns
+    -------
+    rmsd : float
+        root-mean squared deviation
+    &#34;&#34;&#34;
+    if translate:
+        Q = Q - centroid(Q)
+        P = P - centroid(P)
+
+    P = kabsch_rotate(P, Q)
+    return rmsd(P, Q)
+
+
+def kabsch_rotate(P, Q):
+    &#34;&#34;&#34;
+    Rotate matrix P unto matrix Q using Kabsch algorithm.
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    P : array
+        (N,D) matrix, where N is points and D is dimension,
+        rotated
+
+    &#34;&#34;&#34;
+    U = kabsch(P, Q)
+
+    # Rotate P
+    P = np.dot(P, U)
+    return P
+
+
+def kabsch(P, Q):
+    &#34;&#34;&#34;
+    Using the Kabsch algorithm with two sets of paired point P and Q, centered
+    around the centroid. Each vector set is represented as an NxD
+    matrix, where D is the the dimension of the space.
+
+    The algorithm works in three steps:
+    - a centroid translation of P and Q (assumed done before this function
+      call)
+    - the computation of a covariance matrix C
+    - computation of the optimal rotation matrix U
+
+    For more info see http://en.wikipedia.org/wiki/Kabsch_algorithm
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    U : matrix
+        Rotation matrix (D,D)
+    &#34;&#34;&#34;
+
+    # Computation of the covariance matrix
+    C = np.dot(np.transpose(P), Q)
+
+    # Computation of the optimal rotation matrix
+    # This can be done using singular value decomposition (SVD)
+    # Getting the sign of the det(V)*(W) to decide
+    # whether we need to correct our rotation matrix to ensure a
+    # right-handed coordinate system.
+    # And finally calculating the optimal rotation matrix U
+    # see http://en.wikipedia.org/wiki/Kabsch_algorithm
+    V, S, W = np.linalg.svd(C)
+    d = (np.linalg.det(V) * np.linalg.det(W)) &lt; 0.0
+
+    if d:
+        S[-1] = -S[-1]
+        V[:, -1] = -V[:, -1]
+
+    # Create Rotation matrix U
+    U = np.dot(V, W)
+
+    return U
+
+
+def quaternion_rmsd(P, Q):
+    &#34;&#34;&#34;
+    Rotate matrix P unto Q and calculate the RMSD
+    based on doi:10.1016/1049-9660(91)90036-O
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    rmsd : float
+    &#34;&#34;&#34;
+    rot = quaternion_rotate(P, Q)
+    P = np.dot(P, rot)
+    return rmsd(P, Q)
+
+
+def quaternion_transform(r):
+    &#34;&#34;&#34;
+    Get optimal rotation
+    note: translation will be zero when the centroids of each molecule are the
+    same
+    &#34;&#34;&#34;
+    Wt_r = makeW(*r).T
+    Q_r = makeQ(*r)
+    rot = Wt_r.dot(Q_r)[:3, :3]
+    return rot
+
+
+def makeW(r1, r2, r3, r4=0):
+    &#34;&#34;&#34;
+    matrix involved in quaternion rotation
+    &#34;&#34;&#34;
+    W = np.asarray([
+        [r4, r3, -r2, r1],
+        [-r3, r4, r1, r2],
+        [r2, -r1, r4, r3],
+        [-r1, -r2, -r3, r4]])
+    return W
+
+
+def makeQ(r1, r2, r3, r4=0):
+    &#34;&#34;&#34;
+    matrix involved in quaternion rotation
+    &#34;&#34;&#34;
+    Q = np.asarray([
+        [r4, -r3, r2, r1],
+        [r3, r4, -r1, r2],
+        [-r2, r1, r4, r3],
+        [-r1, -r2, -r3, r4]])
+    return Q
+
+
+def quaternion_rotate(X, Y):
+    &#34;&#34;&#34;
+    Calculate the rotation
+
+    Parameters
+    ----------
+    X : array
+        (N,D) matrix, where N is points and D is dimension.
+    Y: array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    rot : matrix
+        Rotation matrix (D,D)
+    &#34;&#34;&#34;
+    N = X.shape[0]
+    W = np.asarray([makeW(*Y[k]) for k in range(N)])
+    Q = np.asarray([makeQ(*X[k]) for k in range(N)])
+    Qt_dot_W = np.asarray([np.dot(Q[k].T, W[k]) for k in range(N)])
+    W_minus_Q = np.asarray([W[k] - Q[k] for k in range(N)])
+    A = np.sum(Qt_dot_W, axis=0)
+    eigen = np.linalg.eigh(A)
+    r = eigen[1][:, eigen[0].argmax()]
+    rot = quaternion_transform(r)
+    return rot
+
+
+def centroid(X):
+    &#34;&#34;&#34;
+    Centroid is the mean position of all the points in all of the coordinate
+    directions, from a vectorset X.
+
+    https://en.wikipedia.org/wiki/Centroid
+
+    C = sum(X)/len(X)
+
+    Parameters
+    ----------
+    X : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    C : float
+        centroid
+    &#34;&#34;&#34;
+    C = X.mean(axis=0)
+    return C
+
+
+def reorder_distance(p_atoms, q_atoms, p_coord, q_coord):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates by atom type and then by
+    distance of each atom from the centroid.
+
+    Parameters
+    ----------
+    atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    atoms_reordered : array
+        (N,1) matrix, where N is points holding the ordered atoms&#39; names
+    coords_reordered : array
+        (N,D) matrix, where N is points and D is dimension (rows re-ordered)
+    &#34;&#34;&#34;
+
+    # Find unique atoms
+    unique_atoms = np.unique(p_atoms)
+
+    # generate full view from q shape to fill in atom view on the fly
+    view_reorder = np.zeros(q_atoms.shape, dtype=int)
+
+    for atom in unique_atoms:
+
+        p_atom_idx, = np.where(p_atoms == atom)
+        q_atom_idx, = np.where(q_atoms == atom)
+
+        A_coord = p_coord[p_atom_idx]
+        B_coord = q_coord[q_atom_idx]
+
+        # Calculate distance from each atom to centroid
+        A_norms = np.linalg.norm(A_coord, axis=1)
+        B_norms = np.linalg.norm(B_coord, axis=1)
+
+        reorder_indices_A = np.argsort(A_norms)
+        reorder_indices_B = np.argsort(B_norms)
+
+        # Project the order of P onto Q
+        translator = np.argsort(reorder_indices_A)
+        view = reorder_indices_B[translator]
+        view_reorder[p_atom_idx] = q_atom_idx[view]
+
+    return view_reorder
+
+
+def hungarian(A, B):
+    &#34;&#34;&#34;
+    Hungarian reordering.
+
+    Assume A and B are coordinates for atoms of SAME type only
+    &#34;&#34;&#34;
+
+    # should be kabasch here i think
+    distances = cdist(A, B, &#39;euclidean&#39;)
+
+    # Perform Hungarian analysis on distance matrix between atoms of 1st
+    # structure and trial structure
+    indices_a, indices_b = linear_sum_assignment(distances)
+
+    return indices_b
+
+
+def reorder_hungarian(p_atoms, q_atoms, p_coord, q_coord):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates using the Hungarian
+    method (using optimized column results)
+
+    Parameters
+    ----------
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_coord : array
+        (N,D) matrix, where N is points and D is dimension
+    q_coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    view_reorder : array
+             (N,1) matrix, reordered indexes of atom alignment based on the
+             coordinates of the atoms
+
+    &#34;&#34;&#34;
+
+    # Find unique atoms
+    unique_atoms = np.unique(p_atoms)
+
+    # generate full view from q shape to fill in atom view on the fly
+    view_reorder = np.zeros(q_atoms.shape, dtype=int)
+    view_reorder -= 1
+
+    for atom in unique_atoms:
+        p_atom_idx, = np.where(p_atoms == atom)
+        q_atom_idx, = np.where(q_atoms == atom)
+
+        A_coord = p_coord[p_atom_idx]
+        B_coord = q_coord[q_atom_idx]
+
+        view = hungarian(A_coord, B_coord)
+        view_reorder[p_atom_idx] = q_atom_idx[view]
+
+    return view_reorder
+
+
+def generate_permutations(elements, n):
+    &#34;&#34;&#34;
+    Heap&#39;s algorithm for generating all n! permutations in a list
+    https://en.wikipedia.org/wiki/Heap%27s_algorithm
+
+    &#34;&#34;&#34;
+    c = [0] * n
+    yield elements
+    i = 0
+    while i &lt; n:
+        if c[i] &lt; i:
+            if i % 2 == 0:
+                elements[0], elements[i] = elements[i], elements[0]
+            else:
+                elements[c[i]], elements[i] = elements[i], elements[c[i]]
+            yield elements
+            c[i] += 1
+            i = 0
+        else:
+            c[i] = 0
+            i += 1
+
+
+def brute_permutation(A, B):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates using the brute force
+    method of permuting all rows of the input coordinates
+
+    Parameters
+    ----------
+    A : array
+        (N,D) matrix, where N is points and D is dimension
+    B : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    view : array
+        (N,1) matrix, reordered view of B projected to A
+    &#34;&#34;&#34;
+
+    rmsd_min = np.inf
+    view_min = None
+
+    # Sets initial ordering for row indices to [0, 1, 2, ..., len(A)], used in
+    # brute-force method
+
+    num_atoms = A.shape[0]
+    initial_order = list(range(num_atoms))
+
+    for reorder_indices in generate_permutations(initial_order, num_atoms):
+
+        # Re-order the atom array and coordinate matrix
+        coords_ordered = B[reorder_indices]
+
+        # Calculate the RMSD between structure 1 and the Hungarian re-ordered
+        # structure 2
+        rmsd_temp = kabsch_rmsd(A, coords_ordered)
+
+        # Replaces the atoms and coordinates with the current structure if the
+        # RMSD is lower
+        if rmsd_temp &lt; rmsd_min:
+            rmsd_min = rmsd_temp
+            view_min = copy.deepcopy(reorder_indices)
+
+    return view_min
+
+
+def reorder_brute(p_atoms, q_atoms, p_coord, q_coord):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates using all permutation of
+    rows (using optimized column results)
+
+    Parameters
+    ----------
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    q_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_coord : array
+        (N,D) matrix, where N is points and D is dimension
+    q_coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    view_reorder : array
+        (N,1) matrix, reordered indexes of atom alignment based on the
+        coordinates of the atoms
+
+    &#34;&#34;&#34;
+
+    # Find unique atoms
+    unique_atoms = np.unique(p_atoms)
+
+    # generate full view from q shape to fill in atom view on the fly
+    view_reorder = np.zeros(q_atoms.shape, dtype=int)
+    view_reorder -= 1
+
+    for atom in unique_atoms:
+        p_atom_idx, = np.where(p_atoms == atom)
+        q_atom_idx, = np.where(q_atoms == atom)
+
+        A_coord = p_coord[p_atom_idx]
+        B_coord = q_coord[q_atom_idx]
+
+        view = brute_permutation(A_coord, B_coord)
+        view_reorder[p_atom_idx] = q_atom_idx[view]
+
+    return view_reorder
+
+
+def check_reflections(p_atoms, q_atoms, p_coord, q_coord,
+                      reorder_method=reorder_hungarian,
+                      rotation_method=kabsch_rmsd,
+                      keep_stereo=False):
+    &#34;&#34;&#34;
+    Minimize RMSD using reflection planes for molecule P and Q
+
+    Warning: This will affect stereo-chemistry
+
+    Parameters
+    ----------
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    q_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_coord : array
+        (N,D) matrix, where N is points and D is dimension
+    q_coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    min_rmsd
+    min_swap
+    min_reflection
+    min_review
+
+    &#34;&#34;&#34;
+
+    min_rmsd = np.inf
+    min_swap = None
+    min_reflection = None
+    min_review = None
+    tmp_review = None
+    swap_mask = [1,-1,-1,1,-1,1]
+    reflection_mask = [1,-1,-1,-1,1,1,1,-1]
+
+    for swap, i in zip(AXIS_SWAPS, swap_mask):
+        for reflection, j in zip(AXIS_REFLECTIONS, reflection_mask):
+            if keep_stereo and  i * j == -1: continue # skip enantiomers
+
+            tmp_atoms = copy.copy(q_atoms)
+            tmp_coord = copy.deepcopy(q_coord)
+            tmp_coord = tmp_coord[:, swap]
+            tmp_coord = np.dot(tmp_coord, np.diag(reflection))
+            tmp_coord -= centroid(tmp_coord)
+
+            # Reorder
+            if reorder_method is not None:
+                tmp_review = reorder_method(p_atoms, tmp_atoms, p_coord, tmp_coord)
+                tmp_coord = tmp_coord[tmp_review]
+                tmp_atoms = tmp_atoms[tmp_review]
+
+            # Rotation
+            if rotation_method is None:
+                this_rmsd = rmsd(p_coord, tmp_coord)
+            else:
+                this_rmsd = rotation_method(p_coord, tmp_coord)
+
+            if this_rmsd &lt; min_rmsd:
+                min_rmsd = this_rmsd
+                min_swap = swap
+                min_reflection = reflection
+                min_review = tmp_review
+
+    if not (p_atoms == q_atoms[min_review]).all():
+        print(&#34;error: Not aligned&#34;)
+        quit()
+
+    return min_rmsd, min_swap, min_reflection, min_review
+
+
+def set_coordinates(atoms, V, title=&#34;&#34;, decimals=8):
+    &#34;&#34;&#34;
+    Print coordinates V with corresponding atoms to stdout in XYZ format.
+    Parameters
+    ----------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) matrix of atomic coordinates
+    title : string (optional)
+        Title of molecule
+    decimals : int (optional)
+        number of decimals for the coordinates
+
+    Return
+    ------
+    output : str
+        Molecule in XYZ format
+
+    &#34;&#34;&#34;
+    N, D = V.shape
+
+    fmt = &#34;{:2s}&#34; + (&#34; {:15.&#34;+str(decimals)+&#34;f}&#34;)*3
+
+    out = list()
+    out += [str(N)]
+    out += [title]
+
+    for i in range(N):
+        atom = atoms[i]
+        atom = atom[0].upper() + atom[1:]
+        out += [fmt.format(atom, V[i, 0], V[i, 1], V[i, 2])]
+
+    return &#34;\n&#34;.join(out)
+
+
+def print_coordinates(atoms, V, title=&#34;&#34;):
+    &#34;&#34;&#34;
+    Print coordinates V with corresponding atoms to stdout in XYZ format.
+
+    Parameters
+    ----------
+    atoms : list
+        List of element types
+    V : array
+        (N,3) matrix of atomic coordinates
+    title : string (optional)
+        Title of molecule
+
+    &#34;&#34;&#34;
+
+    print(set_coordinates(atoms, V, title=title))
+
+    return
+
+
+def get_coordinates(filename, fmt):
+    &#34;&#34;&#34;
+    Get coordinates from filename in format fmt. Supports XYZ and PDB.
+    Parameters
+    ----------
+    filename : string
+        Filename to read
+    fmt : string
+        Format of filename. Either xyz or pdb.
+    Returns
+    -------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) where N is number of atoms
+    &#34;&#34;&#34;
+    if fmt == &#34;xyz&#34;:
+        get_func = get_coordinates_xyz
+    elif fmt == &#34;pdb&#34;:
+        get_func = get_coordinates_pdb
+    else:
+        exit(&#34;Could not recognize file format: {:s}&#34;.format(fmt))
+
+    return get_func(filename)
+
+
+def get_coordinates_pdb(filename):
+    &#34;&#34;&#34;
+    Get coordinates from the first chain in a pdb file
+    and return a vectorset with all the coordinates.
+
+    Parameters
+    ----------
+    filename : string
+        Filename to read
+
+    Returns
+    -------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) where N is number of atoms
+    &#34;&#34;&#34;
+
+    # PDB files tend to be a bit of a mess. The x, y and z coordinates
+    # are supposed to be in column 31-38, 39-46 and 47-54, but this is
+    # not always the case.
+    # Because of this the three first columns containing a decimal is used.
+    # Since the format doesn&#39;t require a space between columns, we use the
+    # above column indices as a fallback.
+
+    x_column = None
+    V = list()
+
+    # Same with atoms and atom naming.
+    # The most robust way to do this is probably
+    # to assume that the atomtype is given in column 3.
+
+    atoms = list()
+
+    with open(filename, &#39;r&#39;) as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith(&#34;TER&#34;) or line.startswith(&#34;END&#34;):
+                break
+            if line.startswith(&#34;ATOM&#34;):
+                tokens = line.split()
+                # Try to get the atomtype
+                try:
+                    atom = tokens[2][0]
+                    if atom in (&#34;H&#34;, &#34;C&#34;, &#34;N&#34;, &#34;O&#34;, &#34;S&#34;, &#34;P&#34;):
+                        atoms.append(atom)
+                    else:
+                        # e.g. 1HD1
+                        atom = tokens[2][1]
+                        if atom == &#34;H&#34;:
+                            atoms.append(atom)
+                        else:
+                            raise Exception
+                except:
+                    exit(&#34;error: Parsing atomtype for the following line: \n{0:s}&#34;.format(line))
+
+                if x_column == None:
+                    try:
+                        # look for x column
+                        for i, x in enumerate(tokens):
+                            if &#34;.&#34; in x and &#34;.&#34; in tokens[i + 1] and &#34;.&#34; in tokens[i + 2]:
+                                x_column = i
+                                break
+                    except IndexError:
+                        exit(&#34;error: Parsing coordinates for the following line: \n{0:s}&#34;.format(line))
+                # Try to read the coordinates
+                try:
+                    V.append(np.asarray(tokens[x_column:x_column + 3], dtype=float))
+                except:
+                    # If that doesn&#39;t work, use hardcoded indices
+                    try:
+                        x = line[30:38]
+                        y = line[38:46]
+                        z = line[46:54]
+                        V.append(np.asarray([x, y ,z], dtype=float))
+                    except:
+                        exit(&#34;error: Parsing input for the following line: \n{0:s}&#34;.format(line))
+
+
+    V = np.asarray(V)
+    atoms = np.asarray(atoms)
+
+    assert V.shape[0] == atoms.size
+
+    return atoms, V
+
+
+def get_coordinates_xyz(filename):
+    &#34;&#34;&#34;
+    Get coordinates from filename and return a vectorset with all the
+    coordinates, in XYZ format.
+
+    Parameters
+    ----------
+    filename : string
+        Filename to read
+
+    Returns
+    -------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) where N is number of atoms
+    &#34;&#34;&#34;
+
+    f = open(filename, &#39;r&#39;)
+    V = list()
+    atoms = list()
+    n_atoms = 0
+
+    # Read the first line to obtain the number of atoms to read
+    try:
+        n_atoms = int(f.readline())
+    except ValueError:
+        exit(&#34;error: Could not obtain the number of atoms in the .xyz file.&#34;)
+
+    # Skip the title line
+    f.readline()
+
+    # Use the number of atoms to not read beyond the end of a file
+    for lines_read, line in enumerate(f):
+
+        if lines_read == n_atoms:
+            break
+
+        atom = re.findall(r&#39;[a-zA-Z]+&#39;, line)[0]
+        atom = atom.upper()
+
+        numbers = re.findall(r&#39;[-]?\d+\.\d*(?:[Ee][-\+]\d+)?&#39;, line)
+        numbers = [float(number) for number in numbers]
+
+        # The numbers are not valid unless we obtain exacly three
+        if len(numbers) &gt;= 3:
+            V.append(np.array(numbers)[:3])
+            atoms.append(atom)
+        else:
+            exit(&#34;Reading the .xyz file failed in line {0}. Please check the format.&#34;.format(lines_read + 2))
+
+    f.close()
+    atoms = np.array(atoms)
+    V = np.array(V)
+    return atoms, V
+
+
+def main():
+
+    import argparse
+    import sys
+
+    description = __doc__
+
+    version_msg = &#34;&#34;&#34;
+rmsd {}
+
+See https://github.com/charnley/rmsd for citation information
+
+&#34;&#34;&#34;
+    version_msg = version_msg.format(__version__)
+
+    epilog = &#34;&#34;&#34;
+&#34;&#34;&#34;
+
+    parser = argparse.ArgumentParser(
+        usage=&#39;calculate_rmsd [options] FILE_A FILE_B&#39;,
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=epilog)
+
+
+    # Input structures
+    parser.add_argument(&#39;structure_a&#39;, metavar=&#39;FILE_A&#39;, type=str, help=&#39;structures in .xyz or .pdb format&#39;)
+    parser.add_argument(&#39;structure_b&#39;, metavar=&#39;FILE_B&#39;, type=str)
+
+    # Admin
+    parser.add_argument(&#39;-v&#39;, &#39;--version&#39;, action=&#39;version&#39;, version=version_msg)
+
+    # Rotation
+    parser.add_argument(&#39;-r&#39;, &#39;--rotation&#39;, action=&#39;store&#39;, default=&#34;kabsch&#34;, help=&#39;select rotation method. &#34;kabsch&#34; (default), &#34;quaternion&#34; or &#34;none&#34;&#39;, metavar=&#34;METHOD&#34;)
+
+    # Reorder arguments
+    parser.add_argument(&#39;-e&#39;, &#39;--reorder&#39;, action=&#39;store_true&#39;, help=&#39;align the atoms of molecules (default: Hungarian)&#39;)
+    parser.add_argument(&#39;--reorder-method&#39;, action=&#39;store&#39;, default=&#34;hungarian&#34;, metavar=&#34;METHOD&#34;, help=&#39;select which reorder method to use; hungarian (default), brute, distance&#39;)
+    parser.add_argument(&#39;--use-reflections&#39;, action=&#39;store_true&#39;, help=&#39;scan through reflections in planes (eg Y transformed to -Y -&gt; X, -Y, Z) and axis changes, (eg X and Z coords exchanged -&gt; Z, Y, X). This will affect stereo-chemistry.&#39;)
+    parser.add_argument(&#39;--use-reflections-keep-stereo&#39;, action=&#39;store_true&#39;, help=&#39;scan through reflections in planes (eg Y transformed to -Y -&gt; X, -Y, Z) and axis changes, (eg X and Z coords exchanged -&gt; Z, Y, X). Stereo-chemistry will be kept.&#39;)
+
+    # Filter
+    index_group = parser.add_mutually_exclusive_group()
+    index_group.add_argument(&#39;-nh&#39;, &#39;--no-hydrogen&#39;, action=&#39;store_true&#39;, help=&#39;ignore hydrogens when calculating RMSD&#39;)
+    index_group.add_argument(&#39;--remove-idx&#39;, nargs=&#39;+&#39;, type=int, help=&#39;index list of atoms NOT to consider&#39;, metavar=&#39;IDX&#39;)
+    index_group.add_argument(&#39;--add-idx&#39;, nargs=&#39;+&#39;, type=int, help=&#39;index list of atoms to consider&#39;, metavar=&#39;IDX&#39;)
+
+    # format and print
+    parser.add_argument(&#39;--format&#39;, action=&#39;store&#39;, help=&#39;format of input files. valid format are xyz and pdb&#39;, metavar=&#39;FMT&#39;)
+    parser.add_argument(&#39;-p&#39;, &#39;--output&#39;, &#39;--print&#39;, action=&#39;store_true&#39;, help=&#39;print out structure B, centered and rotated unto structure A\&#39;s coordinates in XYZ format&#39;)
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
+    args = parser.parse_args()
+
+    # As default, load the extension as format
+    if args.format is None:
+        args.format = args.structure_a.split(&#39;.&#39;)[-1]
+
+    p_all_atoms, p_all = get_coordinates(args.structure_a, args.format)
+    q_all_atoms, q_all = get_coordinates(args.structure_b, args.format)
+
+    p_size = p_all.shape[0]
+    q_size = q_all.shape[0]
+
+    if not p_size == q_size:
+        print(&#34;error: Structures not same size&#34;)
+        quit()
+
+    if np.count_nonzero(p_all_atoms != q_all_atoms) and not args.reorder:
+        msg = &#34;&#34;&#34;
+error: Atoms are not in the same order.
+
+Use --reorder to align the atoms (can be expensive for large structures).
+
+Please see --help or documentation for more information or
+https://github.com/charnley/rmsd for further examples.
+&#34;&#34;&#34;
+        print(msg)
+        exit()
+
+
+    # Set local view
+    p_view = None
+    q_view = None
+
+
+    if args.no_hydrogen:
+        p_view = np.where(p_all_atoms != &#39;H&#39;)
+        q_view = np.where(q_all_atoms != &#39;H&#39;)
+
+    elif args.remove_idx:
+        index = range(p_size)
+        index = set(index) - set(args.remove_idx)
+        index = list(index)
+        p_view = index
+        q_view = index
+
+    elif args.add_idx:
+        p_view = args.add_idx
+        q_view = args.add_idx
+
+
+    # Set local view
+    if p_view is None:
+        p_coord = copy.deepcopy(p_all)
+        q_coord = copy.deepcopy(q_all)
+        p_atoms = copy.deepcopy(p_all_atoms)
+        q_atoms = copy.deepcopy(q_all_atoms)
+
+    else:
+
+        if args.reorder and args.output:
+            print(&#34;error: Cannot reorder atoms and print structure, when excluding atoms (such as --no-hydrogen)&#34;)
+            quit()
+
+        if args.use_reflections and args.output:
+            print(&#34;error: Cannot use reflections on atoms and print, when excluding atoms (such as --no-hydrogen)&#34;)
+            quit()
+
+        p_coord = copy.deepcopy(p_all[p_view])
+        q_coord = copy.deepcopy(q_all[q_view])
+        p_atoms = copy.deepcopy(p_all_atoms[p_view])
+        q_atoms = copy.deepcopy(q_all_atoms[q_view])
+
+
+    # Create the centroid of P and Q which is the geometric center of a
+    # N-dimensional region and translate P and Q onto that center.
+    # http://en.wikipedia.org/wiki/Centroid
+    p_cent = centroid(p_coord)
+    q_cent = centroid(q_coord)
+    p_coord -= p_cent
+    q_coord -= q_cent
+
+
+    # set rotation method
+    if args.rotation.lower() == &#34;kabsch&#34;:
+        rotation_method = kabsch_rmsd
+
+    elif args.rotation.lower() == &#34;quaternion&#34;:
+        rotation_method = quaternion_rmsd
+
+    elif args.rotation.lower() == &#34;none&#34;:
+        rotation_method = None
+
+    else:
+        print(&#34;error: Unknown rotation method:&#34;, args.rotation)
+        quit()
+
+
+    # set reorder method
+    if not args.reorder:
+        reorder_method = None
+
+    if args.reorder_method == &#34;hungarian&#34;:
+        reorder_method = reorder_hungarian
+
+    elif args.reorder_method == &#34;brute&#34;:
+        reorder_method = reorder_brute
+
+    elif args.reorder_method == &#34;distance&#34;:
+        reorder_method = reorder_distance
+
+    else:
+        print(&#34;error: Unknown reorder method:&#34;, args.reorder_method)
+        quit()
+
+
+    # Save the resulting RMSD
+    result_rmsd = None
+
+
+    if args.use_reflections:
+
+        result_rmsd, q_swap, q_reflection, q_review = check_reflections(
+            p_atoms,
+            q_atoms,
+            p_coord,
+            q_coord,
+            reorder_method=reorder_method,
+            rotation_method=rotation_method)
+
+    elif args.use_reflections_keep_stereo:
+
+        result_rmsd, q_swap, q_reflection, q_review = check_reflections(
+            p_atoms,
+            q_atoms,
+            p_coord,
+            q_coord,
+            reorder_method=reorder_method,
+            rotation_method=rotation_method,
+            keep_stereo=True)
+
+    elif args.reorder:
+
+        q_review = reorder_method(p_atoms, q_atoms, p_coord, q_coord)
+        q_coord = q_coord[q_review]
+        q_atoms = q_atoms[q_review]
+
+        if not all(p_atoms == q_atoms):
+            print(&#34;error: Structure not aligned&#34;)
+            quit()
+
+
+    # print result
+    if args.output:
+
+        if args.reorder:
+
+            if q_review.shape[0] != q_all.shape[0]:
+                print(&#34;error: Reorder length error. Full atom list needed for --print&#34;)
+                quit()
+
+            q_all = q_all[q_review]
+            q_all_atoms = q_all_atoms[q_review]
+
+        # Get rotation matrix
+        U = kabsch(q_coord, p_coord)
+
+        # recenter all atoms and rotate all atoms
+        q_all -= q_cent
+        q_all = np.dot(q_all, U)
+
+        # center q on p&#39;s original coordinates
+        q_all += p_cent
+
+        # done and done
+        xyz = set_coordinates(q_all_atoms, q_all, title=&#34;{} - modified&#34;.format(args.structure_b))
+        print(xyz)
+
+    else:
+
+        if result_rmsd:
+            pass
+
+        elif rotation_method is None:
+            result_rmsd = rmsd(p_coord, q_coord)
+
+        else:
+            result_rmsd = rotation_method(p_coord, q_coord)
+
+        print(&#34;{0}&#34;.format(result_rmsd))
+
+
+    return
+
+if __name__ == &#34;__main__&#34;:
+    main()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="dynamo.calculate_rmsd.brute_permutation"><code class="name flex">
+<span>def <span class="ident">brute_permutation</span></span>(<span>A, B)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Re-orders the input atom list and xyz coordinates using the brute force
+method of permuting all rows of the input coordinates</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>A</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+<dt><strong><code>B</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>view</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, reordered view of B projected to A</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def brute_permutation(A, B):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates using the brute force
+    method of permuting all rows of the input coordinates
+
+    Parameters
+    ----------
+    A : array
+        (N,D) matrix, where N is points and D is dimension
+    B : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    view : array
+        (N,1) matrix, reordered view of B projected to A
+    &#34;&#34;&#34;
+
+    rmsd_min = np.inf
+    view_min = None
+
+    # Sets initial ordering for row indices to [0, 1, 2, ..., len(A)], used in
+    # brute-force method
+
+    num_atoms = A.shape[0]
+    initial_order = list(range(num_atoms))
+
+    for reorder_indices in generate_permutations(initial_order, num_atoms):
+
+        # Re-order the atom array and coordinate matrix
+        coords_ordered = B[reorder_indices]
+
+        # Calculate the RMSD between structure 1 and the Hungarian re-ordered
+        # structure 2
+        rmsd_temp = kabsch_rmsd(A, coords_ordered)
+
+        # Replaces the atoms and coordinates with the current structure if the
+        # RMSD is lower
+        if rmsd_temp &lt; rmsd_min:
+            rmsd_min = rmsd_temp
+            view_min = copy.deepcopy(reorder_indices)
+
+    return view_min</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.centroid"><code class="name flex">
+<span>def <span class="ident">centroid</span></span>(<span>X)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Centroid is the mean position of all the points in all of the coordinate
+directions, from a vectorset X.</p>
+<p><a href="https://en.wikipedia.org/wiki/Centroid">https://en.wikipedia.org/wiki/Centroid</a></p>
+<p>C = sum(X)/len(X)</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>X</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>C</code></strong> :&ensp;<code>float</code></dt>
+<dd>centroid</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def centroid(X):
+    &#34;&#34;&#34;
+    Centroid is the mean position of all the points in all of the coordinate
+    directions, from a vectorset X.
+
+    https://en.wikipedia.org/wiki/Centroid
+
+    C = sum(X)/len(X)
+
+    Parameters
+    ----------
+    X : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    C : float
+        centroid
+    &#34;&#34;&#34;
+    C = X.mean(axis=0)
+    return C</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.check_reflections"><code class="name flex">
+<span>def <span class="ident">check_reflections</span></span>(<span>p_atoms, q_atoms, p_coord, q_coord, reorder_method=<function reorder_hungarian at 0x000001E7F67E4BF8>, rotation_method=<function kabsch_rmsd at 0x000001E7F56666A8>, keep_stereo=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Minimize RMSD using reflection planes for molecule P and Q</p>
+<p>Warning: This will affect stereo-chemistry</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>p_atoms</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the atoms' names</dd>
+<dt><strong><code>q_atoms</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the atoms' names</dd>
+<dt><strong><code>p_coord</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+<dt><strong><code>q_coord</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>min_rmsd</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>min_swap</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>min_reflection</code></dt>
+<dd>&nbsp;</dd>
+<dt><code>min_review</code></dt>
+<dd>&nbsp;</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def check_reflections(p_atoms, q_atoms, p_coord, q_coord,
+                      reorder_method=reorder_hungarian,
+                      rotation_method=kabsch_rmsd,
+                      keep_stereo=False):
+    &#34;&#34;&#34;
+    Minimize RMSD using reflection planes for molecule P and Q
+
+    Warning: This will affect stereo-chemistry
+
+    Parameters
+    ----------
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    q_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_coord : array
+        (N,D) matrix, where N is points and D is dimension
+    q_coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    min_rmsd
+    min_swap
+    min_reflection
+    min_review
+
+    &#34;&#34;&#34;
+
+    min_rmsd = np.inf
+    min_swap = None
+    min_reflection = None
+    min_review = None
+    tmp_review = None
+    swap_mask = [1,-1,-1,1,-1,1]
+    reflection_mask = [1,-1,-1,-1,1,1,1,-1]
+
+    for swap, i in zip(AXIS_SWAPS, swap_mask):
+        for reflection, j in zip(AXIS_REFLECTIONS, reflection_mask):
+            if keep_stereo and  i * j == -1: continue # skip enantiomers
+
+            tmp_atoms = copy.copy(q_atoms)
+            tmp_coord = copy.deepcopy(q_coord)
+            tmp_coord = tmp_coord[:, swap]
+            tmp_coord = np.dot(tmp_coord, np.diag(reflection))
+            tmp_coord -= centroid(tmp_coord)
+
+            # Reorder
+            if reorder_method is not None:
+                tmp_review = reorder_method(p_atoms, tmp_atoms, p_coord, tmp_coord)
+                tmp_coord = tmp_coord[tmp_review]
+                tmp_atoms = tmp_atoms[tmp_review]
+
+            # Rotation
+            if rotation_method is None:
+                this_rmsd = rmsd(p_coord, tmp_coord)
+            else:
+                this_rmsd = rotation_method(p_coord, tmp_coord)
+
+            if this_rmsd &lt; min_rmsd:
+                min_rmsd = this_rmsd
+                min_swap = swap
+                min_reflection = reflection
+                min_review = tmp_review
+
+    if not (p_atoms == q_atoms[min_review]).all():
+        print(&#34;error: Not aligned&#34;)
+        quit()
+
+    return min_rmsd, min_swap, min_reflection, min_review</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.generate_permutations"><code class="name flex">
+<span>def <span class="ident">generate_permutations</span></span>(<span>elements, n)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Heap's algorithm for generating all n! permutations in a list
+<a href="https://en.wikipedia.org/wiki/Heap%27s_algorithm">https://en.wikipedia.org/wiki/Heap%27s_algorithm</a></p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def generate_permutations(elements, n):
+    &#34;&#34;&#34;
+    Heap&#39;s algorithm for generating all n! permutations in a list
+    https://en.wikipedia.org/wiki/Heap%27s_algorithm
+
+    &#34;&#34;&#34;
+    c = [0] * n
+    yield elements
+    i = 0
+    while i &lt; n:
+        if c[i] &lt; i:
+            if i % 2 == 0:
+                elements[0], elements[i] = elements[i], elements[0]
+            else:
+                elements[c[i]], elements[i] = elements[i], elements[c[i]]
+            yield elements
+            c[i] += 1
+            i = 0
+        else:
+            c[i] = 0
+            i += 1</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.get_coordinates"><code class="name flex">
+<span>def <span class="ident">get_coordinates</span></span>(<span>filename, fmt)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Get coordinates from filename in format fmt. Supports XYZ and PDB.
+Parameters</p>
+<hr>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>string</code></dt>
+<dd>Filename to read</dd>
+<dt><strong><code>fmt</code></strong> :&ensp;<code>string</code></dt>
+<dd>Format of filename. Either xyz or pdb.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>atoms</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of atomic types</dd>
+<dt><strong><code>V</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,3) where N is number of atoms</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_coordinates(filename, fmt):
+    &#34;&#34;&#34;
+    Get coordinates from filename in format fmt. Supports XYZ and PDB.
+    Parameters
+    ----------
+    filename : string
+        Filename to read
+    fmt : string
+        Format of filename. Either xyz or pdb.
+    Returns
+    -------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) where N is number of atoms
+    &#34;&#34;&#34;
+    if fmt == &#34;xyz&#34;:
+        get_func = get_coordinates_xyz
+    elif fmt == &#34;pdb&#34;:
+        get_func = get_coordinates_pdb
+    else:
+        exit(&#34;Could not recognize file format: {:s}&#34;.format(fmt))
+
+    return get_func(filename)</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.get_coordinates_pdb"><code class="name flex">
+<span>def <span class="ident">get_coordinates_pdb</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Get coordinates from the first chain in a pdb file
+and return a vectorset with all the coordinates.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>string</code></dt>
+<dd>Filename to read</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>atoms</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of atomic types</dd>
+<dt><strong><code>V</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,3) where N is number of atoms</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_coordinates_pdb(filename):
+    &#34;&#34;&#34;
+    Get coordinates from the first chain in a pdb file
+    and return a vectorset with all the coordinates.
+
+    Parameters
+    ----------
+    filename : string
+        Filename to read
+
+    Returns
+    -------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) where N is number of atoms
+    &#34;&#34;&#34;
+
+    # PDB files tend to be a bit of a mess. The x, y and z coordinates
+    # are supposed to be in column 31-38, 39-46 and 47-54, but this is
+    # not always the case.
+    # Because of this the three first columns containing a decimal is used.
+    # Since the format doesn&#39;t require a space between columns, we use the
+    # above column indices as a fallback.
+
+    x_column = None
+    V = list()
+
+    # Same with atoms and atom naming.
+    # The most robust way to do this is probably
+    # to assume that the atomtype is given in column 3.
+
+    atoms = list()
+
+    with open(filename, &#39;r&#39;) as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith(&#34;TER&#34;) or line.startswith(&#34;END&#34;):
+                break
+            if line.startswith(&#34;ATOM&#34;):
+                tokens = line.split()
+                # Try to get the atomtype
+                try:
+                    atom = tokens[2][0]
+                    if atom in (&#34;H&#34;, &#34;C&#34;, &#34;N&#34;, &#34;O&#34;, &#34;S&#34;, &#34;P&#34;):
+                        atoms.append(atom)
+                    else:
+                        # e.g. 1HD1
+                        atom = tokens[2][1]
+                        if atom == &#34;H&#34;:
+                            atoms.append(atom)
+                        else:
+                            raise Exception
+                except:
+                    exit(&#34;error: Parsing atomtype for the following line: \n{0:s}&#34;.format(line))
+
+                if x_column == None:
+                    try:
+                        # look for x column
+                        for i, x in enumerate(tokens):
+                            if &#34;.&#34; in x and &#34;.&#34; in tokens[i + 1] and &#34;.&#34; in tokens[i + 2]:
+                                x_column = i
+                                break
+                    except IndexError:
+                        exit(&#34;error: Parsing coordinates for the following line: \n{0:s}&#34;.format(line))
+                # Try to read the coordinates
+                try:
+                    V.append(np.asarray(tokens[x_column:x_column + 3], dtype=float))
+                except:
+                    # If that doesn&#39;t work, use hardcoded indices
+                    try:
+                        x = line[30:38]
+                        y = line[38:46]
+                        z = line[46:54]
+                        V.append(np.asarray([x, y ,z], dtype=float))
+                    except:
+                        exit(&#34;error: Parsing input for the following line: \n{0:s}&#34;.format(line))
+
+
+    V = np.asarray(V)
+    atoms = np.asarray(atoms)
+
+    assert V.shape[0] == atoms.size
+
+    return atoms, V</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.get_coordinates_xyz"><code class="name flex">
+<span>def <span class="ident">get_coordinates_xyz</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Get coordinates from filename and return a vectorset with all the
+coordinates, in XYZ format.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>filename</code></strong> :&ensp;<code>string</code></dt>
+<dd>Filename to read</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>atoms</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of atomic types</dd>
+<dt><strong><code>V</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,3) where N is number of atoms</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def get_coordinates_xyz(filename):
+    &#34;&#34;&#34;
+    Get coordinates from filename and return a vectorset with all the
+    coordinates, in XYZ format.
+
+    Parameters
+    ----------
+    filename : string
+        Filename to read
+
+    Returns
+    -------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) where N is number of atoms
+    &#34;&#34;&#34;
+
+    f = open(filename, &#39;r&#39;)
+    V = list()
+    atoms = list()
+    n_atoms = 0
+
+    # Read the first line to obtain the number of atoms to read
+    try:
+        n_atoms = int(f.readline())
+    except ValueError:
+        exit(&#34;error: Could not obtain the number of atoms in the .xyz file.&#34;)
+
+    # Skip the title line
+    f.readline()
+
+    # Use the number of atoms to not read beyond the end of a file
+    for lines_read, line in enumerate(f):
+
+        if lines_read == n_atoms:
+            break
+
+        atom = re.findall(r&#39;[a-zA-Z]+&#39;, line)[0]
+        atom = atom.upper()
+
+        numbers = re.findall(r&#39;[-]?\d+\.\d*(?:[Ee][-\+]\d+)?&#39;, line)
+        numbers = [float(number) for number in numbers]
+
+        # The numbers are not valid unless we obtain exacly three
+        if len(numbers) &gt;= 3:
+            V.append(np.array(numbers)[:3])
+            atoms.append(atom)
+        else:
+            exit(&#34;Reading the .xyz file failed in line {0}. Please check the format.&#34;.format(lines_read + 2))
+
+    f.close()
+    atoms = np.array(atoms)
+    V = np.array(V)
+    return atoms, V</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.hungarian"><code class="name flex">
+<span>def <span class="ident">hungarian</span></span>(<span>A, B)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Hungarian reordering.</p>
+<p>Assume A and B are coordinates for atoms of SAME type only</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def hungarian(A, B):
+    &#34;&#34;&#34;
+    Hungarian reordering.
+
+    Assume A and B are coordinates for atoms of SAME type only
+    &#34;&#34;&#34;
+
+    # should be kabasch here i think
+    distances = cdist(A, B, &#39;euclidean&#39;)
+
+    # Perform Hungarian analysis on distance matrix between atoms of 1st
+    # structure and trial structure
+    indices_a, indices_b = linear_sum_assignment(distances)
+
+    return indices_b</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.kabsch"><code class="name flex">
+<span>def <span class="ident">kabsch</span></span>(<span>P, Q)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Using the Kabsch algorithm with two sets of paired point P and Q, centered
+around the centroid. Each vector set is represented as an NxD
+matrix, where D is the the dimension of the space.</p>
+<p>The algorithm works in three steps:
+- a centroid translation of P and Q (assumed done before this function
+call)
+- the computation of a covariance matrix C
+- computation of the optimal rotation matrix U</p>
+<p>For more info see <a href="http://en.wikipedia.org/wiki/Kabsch_algorithm">http://en.wikipedia.org/wiki/Kabsch_algorithm</a></p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>P</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+<dt><strong><code>Q</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>U</code></strong> :&ensp;<code>matrix</code></dt>
+<dd>Rotation matrix (D,D)</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def kabsch(P, Q):
+    &#34;&#34;&#34;
+    Using the Kabsch algorithm with two sets of paired point P and Q, centered
+    around the centroid. Each vector set is represented as an NxD
+    matrix, where D is the the dimension of the space.
+
+    The algorithm works in three steps:
+    - a centroid translation of P and Q (assumed done before this function
+      call)
+    - the computation of a covariance matrix C
+    - computation of the optimal rotation matrix U
+
+    For more info see http://en.wikipedia.org/wiki/Kabsch_algorithm
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    U : matrix
+        Rotation matrix (D,D)
+    &#34;&#34;&#34;
+
+    # Computation of the covariance matrix
+    C = np.dot(np.transpose(P), Q)
+
+    # Computation of the optimal rotation matrix
+    # This can be done using singular value decomposition (SVD)
+    # Getting the sign of the det(V)*(W) to decide
+    # whether we need to correct our rotation matrix to ensure a
+    # right-handed coordinate system.
+    # And finally calculating the optimal rotation matrix U
+    # see http://en.wikipedia.org/wiki/Kabsch_algorithm
+    V, S, W = np.linalg.svd(C)
+    d = (np.linalg.det(V) * np.linalg.det(W)) &lt; 0.0
+
+    if d:
+        S[-1] = -S[-1]
+        V[:, -1] = -V[:, -1]
+
+    # Create Rotation matrix U
+    U = np.dot(V, W)
+
+    return U</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.kabsch_rmsd"><code class="name flex">
+<span>def <span class="ident">kabsch_rmsd</span></span>(<span>P, Q, translate=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Rotate matrix P unto Q using Kabsch algorithm and calculate the RMSD.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>P</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+<dt><strong><code>Q</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+<dt><strong><code>translate</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Use centroids to translate vector P and Q unto each other.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><a title="dynamo.calculate_rmsd.rmsd" href="#dynamo.calculate_rmsd.rmsd"><code>rmsd()</code></a></strong> :&ensp;<code>float</code></dt>
+<dd>root-mean squared deviation</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def kabsch_rmsd(P, Q, translate=False):
+    &#34;&#34;&#34;
+    Rotate matrix P unto Q using Kabsch algorithm and calculate the RMSD.
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+    translate : bool
+        Use centroids to translate vector P and Q unto each other.
+
+    Returns
+    -------
+    rmsd : float
+        root-mean squared deviation
+    &#34;&#34;&#34;
+    if translate:
+        Q = Q - centroid(Q)
+        P = P - centroid(P)
+
+    P = kabsch_rotate(P, Q)
+    return rmsd(P, Q)</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.kabsch_rotate"><code class="name flex">
+<span>def <span class="ident">kabsch_rotate</span></span>(<span>P, Q)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Rotate matrix P unto matrix Q using Kabsch algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>P</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+<dt><strong><code>Q</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>P</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension,
+rotated</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def kabsch_rotate(P, Q):
+    &#34;&#34;&#34;
+    Rotate matrix P unto matrix Q using Kabsch algorithm.
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    P : array
+        (N,D) matrix, where N is points and D is dimension,
+        rotated
+
+    &#34;&#34;&#34;
+    U = kabsch(P, Q)
+
+    # Rotate P
+    P = np.dot(P, U)
+    return P</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def main():
+
+    import argparse
+    import sys
+
+    description = __doc__
+
+    version_msg = &#34;&#34;&#34;
+rmsd {}
+
+See https://github.com/charnley/rmsd for citation information
+
+&#34;&#34;&#34;
+    version_msg = version_msg.format(__version__)
+
+    epilog = &#34;&#34;&#34;
+&#34;&#34;&#34;
+
+    parser = argparse.ArgumentParser(
+        usage=&#39;calculate_rmsd [options] FILE_A FILE_B&#39;,
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=epilog)
+
+
+    # Input structures
+    parser.add_argument(&#39;structure_a&#39;, metavar=&#39;FILE_A&#39;, type=str, help=&#39;structures in .xyz or .pdb format&#39;)
+    parser.add_argument(&#39;structure_b&#39;, metavar=&#39;FILE_B&#39;, type=str)
+
+    # Admin
+    parser.add_argument(&#39;-v&#39;, &#39;--version&#39;, action=&#39;version&#39;, version=version_msg)
+
+    # Rotation
+    parser.add_argument(&#39;-r&#39;, &#39;--rotation&#39;, action=&#39;store&#39;, default=&#34;kabsch&#34;, help=&#39;select rotation method. &#34;kabsch&#34; (default), &#34;quaternion&#34; or &#34;none&#34;&#39;, metavar=&#34;METHOD&#34;)
+
+    # Reorder arguments
+    parser.add_argument(&#39;-e&#39;, &#39;--reorder&#39;, action=&#39;store_true&#39;, help=&#39;align the atoms of molecules (default: Hungarian)&#39;)
+    parser.add_argument(&#39;--reorder-method&#39;, action=&#39;store&#39;, default=&#34;hungarian&#34;, metavar=&#34;METHOD&#34;, help=&#39;select which reorder method to use; hungarian (default), brute, distance&#39;)
+    parser.add_argument(&#39;--use-reflections&#39;, action=&#39;store_true&#39;, help=&#39;scan through reflections in planes (eg Y transformed to -Y -&gt; X, -Y, Z) and axis changes, (eg X and Z coords exchanged -&gt; Z, Y, X). This will affect stereo-chemistry.&#39;)
+    parser.add_argument(&#39;--use-reflections-keep-stereo&#39;, action=&#39;store_true&#39;, help=&#39;scan through reflections in planes (eg Y transformed to -Y -&gt; X, -Y, Z) and axis changes, (eg X and Z coords exchanged -&gt; Z, Y, X). Stereo-chemistry will be kept.&#39;)
+
+    # Filter
+    index_group = parser.add_mutually_exclusive_group()
+    index_group.add_argument(&#39;-nh&#39;, &#39;--no-hydrogen&#39;, action=&#39;store_true&#39;, help=&#39;ignore hydrogens when calculating RMSD&#39;)
+    index_group.add_argument(&#39;--remove-idx&#39;, nargs=&#39;+&#39;, type=int, help=&#39;index list of atoms NOT to consider&#39;, metavar=&#39;IDX&#39;)
+    index_group.add_argument(&#39;--add-idx&#39;, nargs=&#39;+&#39;, type=int, help=&#39;index list of atoms to consider&#39;, metavar=&#39;IDX&#39;)
+
+    # format and print
+    parser.add_argument(&#39;--format&#39;, action=&#39;store&#39;, help=&#39;format of input files. valid format are xyz and pdb&#39;, metavar=&#39;FMT&#39;)
+    parser.add_argument(&#39;-p&#39;, &#39;--output&#39;, &#39;--print&#39;, action=&#39;store_true&#39;, help=&#39;print out structure B, centered and rotated unto structure A\&#39;s coordinates in XYZ format&#39;)
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
+    args = parser.parse_args()
+
+    # As default, load the extension as format
+    if args.format is None:
+        args.format = args.structure_a.split(&#39;.&#39;)[-1]
+
+    p_all_atoms, p_all = get_coordinates(args.structure_a, args.format)
+    q_all_atoms, q_all = get_coordinates(args.structure_b, args.format)
+
+    p_size = p_all.shape[0]
+    q_size = q_all.shape[0]
+
+    if not p_size == q_size:
+        print(&#34;error: Structures not same size&#34;)
+        quit()
+
+    if np.count_nonzero(p_all_atoms != q_all_atoms) and not args.reorder:
+        msg = &#34;&#34;&#34;
+error: Atoms are not in the same order.
+
+Use --reorder to align the atoms (can be expensive for large structures).
+
+Please see --help or documentation for more information or
+https://github.com/charnley/rmsd for further examples.
+&#34;&#34;&#34;
+        print(msg)
+        exit()
+
+
+    # Set local view
+    p_view = None
+    q_view = None
+
+
+    if args.no_hydrogen:
+        p_view = np.where(p_all_atoms != &#39;H&#39;)
+        q_view = np.where(q_all_atoms != &#39;H&#39;)
+
+    elif args.remove_idx:
+        index = range(p_size)
+        index = set(index) - set(args.remove_idx)
+        index = list(index)
+        p_view = index
+        q_view = index
+
+    elif args.add_idx:
+        p_view = args.add_idx
+        q_view = args.add_idx
+
+
+    # Set local view
+    if p_view is None:
+        p_coord = copy.deepcopy(p_all)
+        q_coord = copy.deepcopy(q_all)
+        p_atoms = copy.deepcopy(p_all_atoms)
+        q_atoms = copy.deepcopy(q_all_atoms)
+
+    else:
+
+        if args.reorder and args.output:
+            print(&#34;error: Cannot reorder atoms and print structure, when excluding atoms (such as --no-hydrogen)&#34;)
+            quit()
+
+        if args.use_reflections and args.output:
+            print(&#34;error: Cannot use reflections on atoms and print, when excluding atoms (such as --no-hydrogen)&#34;)
+            quit()
+
+        p_coord = copy.deepcopy(p_all[p_view])
+        q_coord = copy.deepcopy(q_all[q_view])
+        p_atoms = copy.deepcopy(p_all_atoms[p_view])
+        q_atoms = copy.deepcopy(q_all_atoms[q_view])
+
+
+    # Create the centroid of P and Q which is the geometric center of a
+    # N-dimensional region and translate P and Q onto that center.
+    # http://en.wikipedia.org/wiki/Centroid
+    p_cent = centroid(p_coord)
+    q_cent = centroid(q_coord)
+    p_coord -= p_cent
+    q_coord -= q_cent
+
+
+    # set rotation method
+    if args.rotation.lower() == &#34;kabsch&#34;:
+        rotation_method = kabsch_rmsd
+
+    elif args.rotation.lower() == &#34;quaternion&#34;:
+        rotation_method = quaternion_rmsd
+
+    elif args.rotation.lower() == &#34;none&#34;:
+        rotation_method = None
+
+    else:
+        print(&#34;error: Unknown rotation method:&#34;, args.rotation)
+        quit()
+
+
+    # set reorder method
+    if not args.reorder:
+        reorder_method = None
+
+    if args.reorder_method == &#34;hungarian&#34;:
+        reorder_method = reorder_hungarian
+
+    elif args.reorder_method == &#34;brute&#34;:
+        reorder_method = reorder_brute
+
+    elif args.reorder_method == &#34;distance&#34;:
+        reorder_method = reorder_distance
+
+    else:
+        print(&#34;error: Unknown reorder method:&#34;, args.reorder_method)
+        quit()
+
+
+    # Save the resulting RMSD
+    result_rmsd = None
+
+
+    if args.use_reflections:
+
+        result_rmsd, q_swap, q_reflection, q_review = check_reflections(
+            p_atoms,
+            q_atoms,
+            p_coord,
+            q_coord,
+            reorder_method=reorder_method,
+            rotation_method=rotation_method)
+
+    elif args.use_reflections_keep_stereo:
+
+        result_rmsd, q_swap, q_reflection, q_review = check_reflections(
+            p_atoms,
+            q_atoms,
+            p_coord,
+            q_coord,
+            reorder_method=reorder_method,
+            rotation_method=rotation_method,
+            keep_stereo=True)
+
+    elif args.reorder:
+
+        q_review = reorder_method(p_atoms, q_atoms, p_coord, q_coord)
+        q_coord = q_coord[q_review]
+        q_atoms = q_atoms[q_review]
+
+        if not all(p_atoms == q_atoms):
+            print(&#34;error: Structure not aligned&#34;)
+            quit()
+
+
+    # print result
+    if args.output:
+
+        if args.reorder:
+
+            if q_review.shape[0] != q_all.shape[0]:
+                print(&#34;error: Reorder length error. Full atom list needed for --print&#34;)
+                quit()
+
+            q_all = q_all[q_review]
+            q_all_atoms = q_all_atoms[q_review]
+
+        # Get rotation matrix
+        U = kabsch(q_coord, p_coord)
+
+        # recenter all atoms and rotate all atoms
+        q_all -= q_cent
+        q_all = np.dot(q_all, U)
+
+        # center q on p&#39;s original coordinates
+        q_all += p_cent
+
+        # done and done
+        xyz = set_coordinates(q_all_atoms, q_all, title=&#34;{} - modified&#34;.format(args.structure_b))
+        print(xyz)
+
+    else:
+
+        if result_rmsd:
+            pass
+
+        elif rotation_method is None:
+            result_rmsd = rmsd(p_coord, q_coord)
+
+        else:
+            result_rmsd = rotation_method(p_coord, q_coord)
+
+        print(&#34;{0}&#34;.format(result_rmsd))
+
+
+    return</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.makeQ"><code class="name flex">
+<span>def <span class="ident">makeQ</span></span>(<span>r1, r2, r3, r4=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>matrix involved in quaternion rotation</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def makeQ(r1, r2, r3, r4=0):
+    &#34;&#34;&#34;
+    matrix involved in quaternion rotation
+    &#34;&#34;&#34;
+    Q = np.asarray([
+        [r4, -r3, r2, r1],
+        [r3, r4, -r1, r2],
+        [-r2, r1, r4, r3],
+        [-r1, -r2, -r3, r4]])
+    return Q</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.makeW"><code class="name flex">
+<span>def <span class="ident">makeW</span></span>(<span>r1, r2, r3, r4=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>matrix involved in quaternion rotation</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def makeW(r1, r2, r3, r4=0):
+    &#34;&#34;&#34;
+    matrix involved in quaternion rotation
+    &#34;&#34;&#34;
+    W = np.asarray([
+        [r4, r3, -r2, r1],
+        [-r3, r4, r1, r2],
+        [r2, -r1, r4, r3],
+        [-r1, -r2, -r3, r4]])
+    return W</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.print_coordinates"><code class="name flex">
+<span>def <span class="ident">print_coordinates</span></span>(<span>atoms, V, title='')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Print coordinates V with corresponding atoms to stdout in XYZ format.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>atoms</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of element types</dd>
+<dt><strong><code>V</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,3) matrix of atomic coordinates</dd>
+<dt><strong><code>title</code></strong> :&ensp;<code>string</code> (optional)</dt>
+<dd>Title of molecule</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def print_coordinates(atoms, V, title=&#34;&#34;):
+    &#34;&#34;&#34;
+    Print coordinates V with corresponding atoms to stdout in XYZ format.
+
+    Parameters
+    ----------
+    atoms : list
+        List of element types
+    V : array
+        (N,3) matrix of atomic coordinates
+    title : string (optional)
+        Title of molecule
+
+    &#34;&#34;&#34;
+
+    print(set_coordinates(atoms, V, title=title))
+
+    return</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.quaternion_rmsd"><code class="name flex">
+<span>def <span class="ident">quaternion_rmsd</span></span>(<span>P, Q)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Rotate matrix P unto Q and calculate the RMSD
+based on doi:10.1016/1049-9660(91)90036-O</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>P</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+<dt><strong><code>Q</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><a title="dynamo.calculate_rmsd.rmsd" href="#dynamo.calculate_rmsd.rmsd"><code>rmsd()</code></a></strong> :&ensp;<code>float</code></dt>
+<dd>&nbsp;</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def quaternion_rmsd(P, Q):
+    &#34;&#34;&#34;
+    Rotate matrix P unto Q and calculate the RMSD
+    based on doi:10.1016/1049-9660(91)90036-O
+
+    Parameters
+    ----------
+    P : array
+        (N,D) matrix, where N is points and D is dimension.
+    Q : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    rmsd : float
+    &#34;&#34;&#34;
+    rot = quaternion_rotate(P, Q)
+    P = np.dot(P, rot)
+    return rmsd(P, Q)</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.quaternion_rotate"><code class="name flex">
+<span>def <span class="ident">quaternion_rotate</span></span>(<span>X, Y)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Calculate the rotation</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>X</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+<dt><strong><code>Y</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>rot</code></strong> :&ensp;<code>matrix</code></dt>
+<dd>Rotation matrix (D,D)</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def quaternion_rotate(X, Y):
+    &#34;&#34;&#34;
+    Calculate the rotation
+
+    Parameters
+    ----------
+    X : array
+        (N,D) matrix, where N is points and D is dimension.
+    Y: array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    rot : matrix
+        Rotation matrix (D,D)
+    &#34;&#34;&#34;
+    N = X.shape[0]
+    W = np.asarray([makeW(*Y[k]) for k in range(N)])
+    Q = np.asarray([makeQ(*X[k]) for k in range(N)])
+    Qt_dot_W = np.asarray([np.dot(Q[k].T, W[k]) for k in range(N)])
+    W_minus_Q = np.asarray([W[k] - Q[k] for k in range(N)])
+    A = np.sum(Qt_dot_W, axis=0)
+    eigen = np.linalg.eigh(A)
+    r = eigen[1][:, eigen[0].argmax()]
+    rot = quaternion_transform(r)
+    return rot</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.quaternion_transform"><code class="name flex">
+<span>def <span class="ident">quaternion_transform</span></span>(<span>r)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Get optimal rotation
+note: translation will be zero when the centroids of each molecule are the
+same</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def quaternion_transform(r):
+    &#34;&#34;&#34;
+    Get optimal rotation
+    note: translation will be zero when the centroids of each molecule are the
+    same
+    &#34;&#34;&#34;
+    Wt_r = makeW(*r).T
+    Q_r = makeQ(*r)
+    rot = Wt_r.dot(Q_r)[:3, :3]
+    return rot</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.reorder_brute"><code class="name flex">
+<span>def <span class="ident">reorder_brute</span></span>(<span>p_atoms, q_atoms, p_coord, q_coord)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Re-orders the input atom list and xyz coordinates using all permutation of
+rows (using optimized column results)</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>p_atoms</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the atoms' names</dd>
+<dt><strong><code>q_atoms</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the atoms' names</dd>
+<dt><strong><code>p_coord</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+<dt><strong><code>q_coord</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>view_reorder</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, reordered indexes of atom alignment based on the
+coordinates of the atoms</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def reorder_brute(p_atoms, q_atoms, p_coord, q_coord):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates using all permutation of
+    rows (using optimized column results)
+
+    Parameters
+    ----------
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    q_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_coord : array
+        (N,D) matrix, where N is points and D is dimension
+    q_coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    view_reorder : array
+        (N,1) matrix, reordered indexes of atom alignment based on the
+        coordinates of the atoms
+
+    &#34;&#34;&#34;
+
+    # Find unique atoms
+    unique_atoms = np.unique(p_atoms)
+
+    # generate full view from q shape to fill in atom view on the fly
+    view_reorder = np.zeros(q_atoms.shape, dtype=int)
+    view_reorder -= 1
+
+    for atom in unique_atoms:
+        p_atom_idx, = np.where(p_atoms == atom)
+        q_atom_idx, = np.where(q_atoms == atom)
+
+        A_coord = p_coord[p_atom_idx]
+        B_coord = q_coord[q_atom_idx]
+
+        view = brute_permutation(A_coord, B_coord)
+        view_reorder[p_atom_idx] = q_atom_idx[view]
+
+    return view_reorder</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.reorder_distance"><code class="name flex">
+<span>def <span class="ident">reorder_distance</span></span>(<span>p_atoms, q_atoms, p_coord, q_coord)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Re-orders the input atom list and xyz coordinates by atom type and then by
+distance of each atom from the centroid.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>atoms</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the atoms' names</dd>
+<dt><strong><code>coord</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>atoms_reordered</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the ordered atoms' names</dd>
+<dt><strong><code>coords_reordered</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension (rows re-ordered)</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def reorder_distance(p_atoms, q_atoms, p_coord, q_coord):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates by atom type and then by
+    distance of each atom from the centroid.
+
+    Parameters
+    ----------
+    atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    atoms_reordered : array
+        (N,1) matrix, where N is points holding the ordered atoms&#39; names
+    coords_reordered : array
+        (N,D) matrix, where N is points and D is dimension (rows re-ordered)
+    &#34;&#34;&#34;
+
+    # Find unique atoms
+    unique_atoms = np.unique(p_atoms)
+
+    # generate full view from q shape to fill in atom view on the fly
+    view_reorder = np.zeros(q_atoms.shape, dtype=int)
+
+    for atom in unique_atoms:
+
+        p_atom_idx, = np.where(p_atoms == atom)
+        q_atom_idx, = np.where(q_atoms == atom)
+
+        A_coord = p_coord[p_atom_idx]
+        B_coord = q_coord[q_atom_idx]
+
+        # Calculate distance from each atom to centroid
+        A_norms = np.linalg.norm(A_coord, axis=1)
+        B_norms = np.linalg.norm(B_coord, axis=1)
+
+        reorder_indices_A = np.argsort(A_norms)
+        reorder_indices_B = np.argsort(B_norms)
+
+        # Project the order of P onto Q
+        translator = np.argsort(reorder_indices_A)
+        view = reorder_indices_B[translator]
+        view_reorder[p_atom_idx] = q_atom_idx[view]
+
+    return view_reorder</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.reorder_hungarian"><code class="name flex">
+<span>def <span class="ident">reorder_hungarian</span></span>(<span>p_atoms, q_atoms, p_coord, q_coord)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Re-orders the input atom list and xyz coordinates using the Hungarian
+method (using optimized column results)</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>p_atoms</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the atoms' names</dd>
+<dt><strong><code>p_atoms</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, where N is points holding the atoms' names</dd>
+<dt><strong><code>p_coord</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+<dt><strong><code>q_coord</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>view_reorder</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,1) matrix, reordered indexes of atom alignment based on the
+coordinates of the atoms</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def reorder_hungarian(p_atoms, q_atoms, p_coord, q_coord):
+    &#34;&#34;&#34;
+    Re-orders the input atom list and xyz coordinates using the Hungarian
+    method (using optimized column results)
+
+    Parameters
+    ----------
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_atoms : array
+        (N,1) matrix, where N is points holding the atoms&#39; names
+    p_coord : array
+        (N,D) matrix, where N is points and D is dimension
+    q_coord : array
+        (N,D) matrix, where N is points and D is dimension
+
+    Returns
+    -------
+    view_reorder : array
+             (N,1) matrix, reordered indexes of atom alignment based on the
+             coordinates of the atoms
+
+    &#34;&#34;&#34;
+
+    # Find unique atoms
+    unique_atoms = np.unique(p_atoms)
+
+    # generate full view from q shape to fill in atom view on the fly
+    view_reorder = np.zeros(q_atoms.shape, dtype=int)
+    view_reorder -= 1
+
+    for atom in unique_atoms:
+        p_atom_idx, = np.where(p_atoms == atom)
+        q_atom_idx, = np.where(q_atoms == atom)
+
+        A_coord = p_coord[p_atom_idx]
+        B_coord = q_coord[q_atom_idx]
+
+        view = hungarian(A_coord, B_coord)
+        view_reorder[p_atom_idx] = q_atom_idx[view]
+
+    return view_reorder</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.rmsd"><code class="name flex">
+<span>def <span class="ident">rmsd</span></span>(<span>V, W)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Calculate Root-mean-square deviation from two sets of vectors V and W.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>V</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+<dt><strong><code>W</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,D) matrix, where N is points and D is dimension.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><a title="dynamo.calculate_rmsd.rmsd" href="#dynamo.calculate_rmsd.rmsd"><code>rmsd()</code></a></strong> :&ensp;<code>float</code></dt>
+<dd>Root-mean-square deviation between the two vectors</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def rmsd(V, W):
+    &#34;&#34;&#34;
+    Calculate Root-mean-square deviation from two sets of vectors V and W.
+
+    Parameters
+    ----------
+    V : array
+        (N,D) matrix, where N is points and D is dimension.
+    W : array
+        (N,D) matrix, where N is points and D is dimension.
+
+    Returns
+    -------
+    rmsd : float
+        Root-mean-square deviation between the two vectors
+    &#34;&#34;&#34;
+    D = len(V[0])
+    N = len(V)
+    result = 0.0
+    for v, w in zip(V, W):
+        result += sum([(v[i] - w[i])**2.0 for i in range(D)])
+    return np.sqrt(result/N)</code></pre>
+</details>
+</dd>
+<dt id="dynamo.calculate_rmsd.set_coordinates"><code class="name flex">
+<span>def <span class="ident">set_coordinates</span></span>(<span>atoms, V, title='', decimals=8)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Print coordinates V with corresponding atoms to stdout in XYZ format.
+Parameters</p>
+<hr>
+<dl>
+<dt><strong><code>atoms</code></strong> :&ensp;<code>list</code></dt>
+<dd>List of atomic types</dd>
+<dt><strong><code>V</code></strong> :&ensp;<code>array</code></dt>
+<dd>(N,3) matrix of atomic coordinates</dd>
+<dt><strong><code>title</code></strong> :&ensp;<code>string</code> (optional)</dt>
+<dd>Title of molecule</dd>
+<dt><strong><code>decimals</code></strong> :&ensp;<code>int</code> (optional)</dt>
+<dd>number of decimals for the coordinates</dd>
+</dl>
+<h2 id="return">Return</h2>
+<dl>
+<dt><strong><code>output</code></strong> :&ensp;<code>str</code></dt>
+<dd>Molecule in XYZ format</dd>
+</dl></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def set_coordinates(atoms, V, title=&#34;&#34;, decimals=8):
+    &#34;&#34;&#34;
+    Print coordinates V with corresponding atoms to stdout in XYZ format.
+    Parameters
+    ----------
+    atoms : list
+        List of atomic types
+    V : array
+        (N,3) matrix of atomic coordinates
+    title : string (optional)
+        Title of molecule
+    decimals : int (optional)
+        number of decimals for the coordinates
+
+    Return
+    ------
+    output : str
+        Molecule in XYZ format
+
+    &#34;&#34;&#34;
+    N, D = V.shape
+
+    fmt = &#34;{:2s}&#34; + (&#34; {:15.&#34;+str(decimals)+&#34;f}&#34;)*3
+
+    out = list()
+    out += [str(N)]
+    out += [title]
+
+    for i in range(N):
+        atom = atoms[i]
+        atom = atom[0].upper() + atom[1:]
+        out += [fmt.format(atom, V[i, 0], V[i, 1], V[i, 2])]
+
+    return &#34;\n&#34;.join(out)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="dynamo" href="index.html">dynamo</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="dynamo.calculate_rmsd.brute_permutation" href="#dynamo.calculate_rmsd.brute_permutation">brute_permutation</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.centroid" href="#dynamo.calculate_rmsd.centroid">centroid</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.check_reflections" href="#dynamo.calculate_rmsd.check_reflections">check_reflections</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.generate_permutations" href="#dynamo.calculate_rmsd.generate_permutations">generate_permutations</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.get_coordinates" href="#dynamo.calculate_rmsd.get_coordinates">get_coordinates</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.get_coordinates_pdb" href="#dynamo.calculate_rmsd.get_coordinates_pdb">get_coordinates_pdb</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.get_coordinates_xyz" href="#dynamo.calculate_rmsd.get_coordinates_xyz">get_coordinates_xyz</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.hungarian" href="#dynamo.calculate_rmsd.hungarian">hungarian</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.kabsch" href="#dynamo.calculate_rmsd.kabsch">kabsch</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.kabsch_rmsd" href="#dynamo.calculate_rmsd.kabsch_rmsd">kabsch_rmsd</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.kabsch_rotate" href="#dynamo.calculate_rmsd.kabsch_rotate">kabsch_rotate</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.main" href="#dynamo.calculate_rmsd.main">main</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.makeQ" href="#dynamo.calculate_rmsd.makeQ">makeQ</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.makeW" href="#dynamo.calculate_rmsd.makeW">makeW</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.print_coordinates" href="#dynamo.calculate_rmsd.print_coordinates">print_coordinates</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.quaternion_rmsd" href="#dynamo.calculate_rmsd.quaternion_rmsd">quaternion_rmsd</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.quaternion_rotate" href="#dynamo.calculate_rmsd.quaternion_rotate">quaternion_rotate</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.quaternion_transform" href="#dynamo.calculate_rmsd.quaternion_transform">quaternion_transform</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.reorder_brute" href="#dynamo.calculate_rmsd.reorder_brute">reorder_brute</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.reorder_distance" href="#dynamo.calculate_rmsd.reorder_distance">reorder_distance</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.reorder_hungarian" href="#dynamo.calculate_rmsd.reorder_hungarian">reorder_hungarian</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.rmsd" href="#dynamo.calculate_rmsd.rmsd">rmsd</a></code></li>
+<li><code><a title="dynamo.calculate_rmsd.set_coordinates" href="#dynamo.calculate_rmsd.set_coordinates">set_coordinates</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
