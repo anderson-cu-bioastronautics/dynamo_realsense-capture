@@ -107,7 +107,8 @@ def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSqu
     deviceManager.enable_all_devices()
     file = open(fileName,'wb')             
     time.sleep(1) #let autoexposure on cameras stabilize over one second 
-    chessboardLocations = detectChessboard(deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
+    cameraSet = deviceManager._enabled_devices
+    chessboardLocations = detectChessboard(deviceManager, cameraSet, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
     devicesTransformations = poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize) #return dictionary of 
     pickle.dump(devicesTransformations, file)
     file.close()
