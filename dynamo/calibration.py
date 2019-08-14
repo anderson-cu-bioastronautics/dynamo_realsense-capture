@@ -65,8 +65,8 @@ def load(fileName):
     -------
     load('savedCalibration.cal')
     """
-    file = open(fileName,'rb')
-    devicesTransformation = pickle.load(file)
+    with open(fileName,'rb') as f:
+        devicesTransformation = pickle.load(f)
     return devicesTransformation
 
 def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize):
@@ -105,13 +105,13 @@ def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSqu
     """
 
     deviceManager.enable_all_devices()
-    file = open(fileName,'wb')             
+               
     time.sleep(1) #let autoexposure on cameras stabilize over one second 
     cameraSet = deviceManager._enabled_devices
     chessboardLocations = detectChessboard(deviceManager, cameraSet, chessboardHeight, chessboardWidth, chessboardSquareSize) #return locations of chessboards from reference frame of each camera
     devicesTransformations = poseTransformation(chessboardLocations, chessboardHeight, chessboardWidth, chessboardSquareSize) #return dictionary of 
-    pickle.dump(devicesTransformations, file)
-    file.close()
+    with open(fileName,'wb') as f:
+        pickle.dump(devicesTransformations, f)
     return devicesTransformations
 
 def newIterative(fileName,deviceManager, cameraList, chessboardHeight, chessboardWidth, chessboardSquareSize):
@@ -154,7 +154,6 @@ def newIterative(fileName,deviceManager, cameraList, chessboardHeight, chessboar
     """
 
     deviceManager.enable_all_devices()
-    file = open(fileName,'wb')        
 
     deviceTransformations = {}
     cameraSets = []
@@ -184,8 +183,8 @@ def newIterative(fileName,deviceManager, cameraList, chessboardHeight, chessboar
                 print(str(c)+':'+str(cm))
             #deviceTransformations[cameraList[c]][0] = np.matmul(deviceTransformations[cameraList[1]][0],deviceTransformations[cameraList[0]][0])
     print(deviceTransformations)
-    pickle.dump(deviceTransformations, file)
-    file.close()
+    with open(fileName,'wb') as f:
+        pickle.dump(deviceTransformations, f)
     return deviceTransformations
 
 
