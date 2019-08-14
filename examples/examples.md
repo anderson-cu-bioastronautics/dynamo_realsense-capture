@@ -136,7 +136,7 @@ Previously saved calibration transformation matrices can be loaded using `calibr
 ```python
 from dynamo.realsense_device_manager import DeviceManager
 from dynamo import calibration, stream
-import pyrealsense 2 as rs
+import pyrealsense2 as rs
 
 resolutionWidth = 848
 resolutionHeight = 480
@@ -165,10 +165,9 @@ By default, this function only displays every 10 frames to allow for quick revie
 from dynamo import view
 
 folder = 'testData'
-iteration = '1'
 full = 1 #set to 1 to view all frames, set to 0 to view every 10 frames
 
-view.viewPointCloud(folder,iteration,full)
+view.viewPointCloud(folder,full)
 ```
 
 ## Getting Marker Locations from Frame
