@@ -67,7 +67,7 @@ def load(fileName):
     """
     file = open(fileName,'rb')
     devicesTransformation = pickle.load(file)
-
+    return devicesTransformation
 
 def new(fileName,deviceManager, chessboardHeight, chessboardWidth, chessboardSquareSize):
     """ 
