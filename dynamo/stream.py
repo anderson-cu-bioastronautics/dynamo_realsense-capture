@@ -29,14 +29,15 @@ def captureThread(q,deviceManager,stream_time):
     deviceManager : DeviceManager object
         realsense_device_manager object which manages connections to all cameras
 
-    time : float
+    stream_time : float
         Time in seconds for how long to collect data
     """
     i=0
-    fnumber = deviceManager.poll_frames()['822512060853'].get_frame_number() #get frame number to ensure subsequent frames are saved
+    refSerial = list(deviceManager._enabled_devices.keys())[0]
+    fnumber = deviceManager.poll_frames()[refSerial].get_frame_number() #get frame number to ensure subsequent frames are saved
     while i<int(90*stream_time):
         frames = deviceManager.poll_frames()
-        newfnumber = frames['822512060853'].get_frame_number()
+        newfnumber = frames[refSerial].get_frame_number()
         if fnumber != newfnumber: #only save if frame has not already been saved
             q.put(frames)
             i+=1
@@ -56,11 +57,8 @@ def processThread(q,devicesTransformation, saveDirectory):
     devicesTransformation : dict
         dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera
 
-    folder : str
+    saveDirectory : str
         Folder name in which to save frames, referenced to current working directory
-
-    iteration : int
-        Iteration of data collection, subsequent iterations will be saved in the folder specified
 
     """
 
@@ -153,11 +151,8 @@ def start(deviceManager, deviceTransformations, saveDirectory, stream_time):
     devicesTransformation : dict
         dictionary with keys of camera's serial number holding dictionary of calibration parameters per camera
 
-    folder : str
+    saveDirectory : str
         Folder name in which to save frames, referenced to current working directory
-
-    iteration : int
-        Iteration of data collection, subsequent iterations will be saved in the folder specified
 
     time : float
         Time in seconds for how long to collect data

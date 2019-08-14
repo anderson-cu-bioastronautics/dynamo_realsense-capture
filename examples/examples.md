@@ -129,7 +129,7 @@ transformationMatrices = calibration.new(fileName, deviceManager, chessboardWidt
 ```
 ## Camera Streaming to Disk
 Once the cameras have been calibrated, they can be streamed and saved to disk.
-The function `stream.start()` takes as arguments the `Device Manager` object, the calibration transformation matrices, the folder in which to save the data, the data collection iteration number which acts as a subfolder in which to save the data, and the time to collect data. 
+The function `stream.start()` takes as arguments the `Device Manager` object, the calibration transformation matrices, the folder in which to save the data, and the time to collect data. 
 
 Previously saved calibration transformation matrices can be loaded using `calibration.load`.
 
@@ -151,7 +151,7 @@ transformationMatrices = calibration.load('newCalibration.cal')
 deviceManager = DeviceManager(rs.context(), rsConfig)
 deviceManager.enable_all_devices()
 
-stream.start(deviceManager, transformationMatrices, 'saveFolder', iteration, time)
+stream.start(deviceManager, transformationMatrices, 'saveFolder', time)
 
 ```
 
