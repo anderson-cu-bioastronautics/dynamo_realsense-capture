@@ -109,8 +109,7 @@ def depthFrametoPC(deviceData, **kwargs):
     points3x4 = np.vstack((points, np.ones((1,points.shape[1])))) #append 1s to the list of points so that we can multiply by a 4x4 matrix
     pointsTransformed = np.matmul(poseMat, points3x4) #muliply by 4x4 transformation matrix
     pointsTransformed = np.true_divide(pointsTransformed[:3,:], pointsTransformed[[-1], :])
-    kwargs = {}
-    kwargs[&#39;format&#39;] = &#39;pcl&#39;
+
     if not kwargs[&#39;format&#39;] or kwargs[&#39;format&#39;] == &#39;pcl&#39;:
         pointCloud = np.asanyarray([pointsTransformed[0,:],pointsTransformed[1,:],pointsTransformed[2,:],rgbPC]).T #append column of point colors to transformed points
     elif kwargs[&#39;format&#39;] ==  &#39;rgb&#39;:
@@ -280,8 +279,7 @@ if __name__==&#34;__main__&#34;:
     points3x4 = np.vstack((points, np.ones((1,points.shape[1])))) #append 1s to the list of points so that we can multiply by a 4x4 matrix
     pointsTransformed = np.matmul(poseMat, points3x4) #muliply by 4x4 transformation matrix
     pointsTransformed = np.true_divide(pointsTransformed[:3,:], pointsTransformed[[-1], :])
-    kwargs = {}
-    kwargs[&#39;format&#39;] = &#39;pcl&#39;
+
     if not kwargs[&#39;format&#39;] or kwargs[&#39;format&#39;] == &#39;pcl&#39;:
         pointCloud = np.asanyarray([pointsTransformed[0,:],pointsTransformed[1,:],pointsTransformed[2,:],rgbPC]).T #append column of point colors to transformed points
     elif kwargs[&#39;format&#39;] ==  &#39;rgb&#39;:
