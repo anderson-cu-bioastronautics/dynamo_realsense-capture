@@ -27,7 +27,7 @@ def signalHandler(signal,frame):
     sys.exit()
 
 
-def depthFrametoPC(deviceData, **kwargs):
+def depthFrametoPC(deviceData, format='pcl'):
     """
     Function which takes saved depth and color/infrared 2D frames and converts to a colored 3D pointcloud 
 
@@ -84,9 +84,9 @@ def depthFrametoPC(deviceData, **kwargs):
     pointsTransformed = np.matmul(poseMat, points3x4) #muliply by 4x4 transformation matrix
     pointsTransformed = np.true_divide(pointsTransformed[:3,:], pointsTransformed[[-1], :])
 
-    if not kwargs['format'] or kwargs['format'] == 'pcl':
+    if format == 'pcl':
         pointCloud = np.asanyarray([pointsTransformed[0,:],pointsTransformed[1,:],pointsTransformed[2,:],rgbPC]).T #append column of point colors to transformed points
-    elif kwargs['format'] ==  'rgb':
+    elif format ==  'rgb':
         pointCloud = np.asanyarray([pointsTransformed[0,:],pointsTransformed[1,:],pointsTransformed[2,:], rgbR, rgbG, rgbB]).T #append column of point colors to transformed points
     return pointCloud
 
