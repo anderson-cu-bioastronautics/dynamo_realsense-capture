@@ -167,7 +167,7 @@ from dynamo import view
 folder = 'testData'
 full = 1 #set to 1 to view all frames, set to 0 to view every 10 frames
 
-view.viewPointCloud(folder,full)
+view.viewPointClouds(folder,full)
 ```
 
 ## Getting Marker Locations from Frame

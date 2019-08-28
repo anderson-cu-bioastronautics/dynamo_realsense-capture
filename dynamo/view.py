@@ -108,7 +108,7 @@ def getPointCloud(frame):
     p = multiprocessing.Pool(6) #create a multiprocessing pool to efficiently create pointclouds in parallel
     signal.signal(signal.SIGINT, signalHandler)
     listP = [data for serial, data in frame.items()]
-    cameraPoints = p.map(depthFrametoPC, listP, format='pcl') #process point cloud for each camera in a separate thread
+    cameraPoints = p.map(depthFrametoPC, listP) #process point cloud for each camera in a separate thread
     pointCloud = np.empty((0,4))
     for camera in cameraPoints:
         pointCloud = np.append(pointCloud, camera, axis=0)
