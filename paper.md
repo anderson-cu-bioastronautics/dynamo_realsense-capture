@@ -79,7 +79,7 @@ This transformation is known in the computer vision community, and is crucial to
 
 Connected cameras are setup using a ``device_manager`` object which handles calls for communicating with the cameras. 
 Cameras are first calibrated to a common global coordinate system by using a defined chessboard viewable by all cameras. 
-The chessboard points are detected using the ``findChessboardCorners`` function of the OpenCV library (opencv_library) for each camera's color image.
+The chessboard points are detected using the ``findChessboardCorners`` function of the OpenCV library [@opencv_library] for each camera's color image.
 Once the chessboard corners are found, they are translated to 3D points from the perspective of each camera and centered.  
 
 The Kabsch algorithm [@Kabsch:1976] is used to compute the $(3\times3)$ rotation matrix between each camera and the known chessboard coordinates.
