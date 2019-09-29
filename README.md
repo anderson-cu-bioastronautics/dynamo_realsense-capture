@@ -1,6 +1,6 @@
 # Dynamic Body Shape and Motion Capture with Intel RealSense Cameras (DynaMo)
 
-![Zenodo DOI: 10.5281/zenodo.3464497](https://zenodo.org/badge/DOI/10.5281/zenodo.3464497.svg)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01466/status.svg)](https://doi.org/10.21105/joss.01466)
 
 DynaMo is an open-source Python package which allows for the capture of dynamic body shape data and/or motion capture using Intel RealSense cameras. 
 The package is developed primarly for use in biomechanical analyses, but can be extended to any application where dynamic changes in surface morphology need to captured, or the 3D location of a marker needs to be tracked. 
