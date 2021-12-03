@@ -92,7 +92,7 @@ def apply_brightness_contrast(input_img, brightness = 0, contrast = 0):
         buf = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
     return buf
 
-folderPath = "" # r'D:/001_BB_0.75'
+folderPath = "Z:/files/realsenseValidation/data/processing/001_BC_0.75" # r'D:/001_BB_0.75' python likes regular slash, not backslash
 serial = '822512060853'
 marker = 'LSAC'
 
