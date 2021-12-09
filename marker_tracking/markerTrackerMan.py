@@ -12,10 +12,10 @@ import ezc3d
 from skimage import exposure
 
 
-def dist3d(p1, p2):
+def dist3d(p1, p2): #calculating distance from 2 points
     return sqrt((p1[0]-p2[0])^2 +(p1[1]-p2[1])^2+(p1[2]-p2[2])^2)
 
-def get_surrDepths(contourPoints, depthFrame):
+def get_surrDepths(contourPoints, depthFrame): #assuming this calculates depth from one of the camera sensors?
     depthVals = []
     if len(contourPoints)==2:
         depthVals.append(depthFrame[contourPoints[1], contourPoints[0]])
@@ -26,7 +26,7 @@ def get_surrDepths(contourPoints, depthFrame):
     depth = np.mean(depthVals)
     return depth
 
-def get_centroid(x, y, w, h):
+def get_centroid(x, y, w, h): #Is this finding the center for calibration?
     x1 = int(w / 2)
     y1 = int(h / 2)
 
@@ -43,7 +43,7 @@ def f2d23d(u,v,depthFrame, cameraIntrinsics, poseMat):
     ### https://github.com/IntelRealSense/librealsense/blob/master/wrappers/python/examples/box_dimensioner_multicam/helper_functions.py ###
     
     #depth = get_surrDepths(contourPoints, depthFrame)
-    depth = depthFrame[v,u]
+    depth = depthFrame[v,u]#what is this, exactly?
     #print(depth)
     #cv2.imshow('depth',cv2.normalize(depthFrame, None, alpha = 0, beta = 1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F))
     #cv2.waitKey(1)
@@ -53,14 +53,14 @@ def f2d23d(u,v,depthFrame, cameraIntrinsics, poseMat):
     y = (v - cameraIntrinsics['ppy'])/cameraIntrinsics['fy']
     z = (depth+4)/1000
     x = x*z
-    y = y*z
+    y = y*z #not sure what this is
     
     ###                                                                                                                                  ###
 
 
     points = np.asanyarray([x,y,z,1]) 
 
-    pointsTransformed = np.matmul(poseMat, points)*1000 #muliply by 4x4 transformation matrix
+    pointsTransformed = np.matmul(poseMat, points)*1000 #muliply by 4x4 transformation matrix; but why?
     
     #pointsTransformed = np.true_divide(pointsTransformed[:3,:], pointsTransformed[[-1], :])
     
@@ -69,17 +69,17 @@ def f2d23d(u,v,depthFrame, cameraIntrinsics, poseMat):
 
 def rectContains(rect,pt): #https://stackoverflow.com/questions/33065834/how-to-detect-if-a-point-is-contained-within-a-bounding-rect-opecv-python
     logic = rect[0] < pt[0] < rect[0]+rect[2] and rect[1] < pt[1] < rect[1]+rect[3]
-    return logic
+    return logic #this tells if the point is within the given box
 
 
-def apply_brightness_contrast(input_img, brightness = 0, contrast = 0):
-    if brightness != 0:
-        if brightness > 0:
-            shadow = brightness
-            highlight = 255
-        else:
+def apply_brightness_contrast(input_img, brightness = 0, contrast = 0): #how does this work/what does this do?
+    if brightness != 0: #is brightness one individual pixel?
+        if brightness > 0: #if it is not black
+            shadow = brightness #set zero as the lowest brightness?
+            highlight = 255 #set highest brightness to max?
+        else: #if it is black
             shadow = 0
-            highlight = 255 + brightness
+            highlight = 255 + brightness #what is this? and next 3 lines?
         alpha_b = (highlight - shadow)/255
         gamma_b = shadow 
         buf = cv2.addWeighted(input_img, alpha_b, input_img, 0, gamma_b)
@@ -96,7 +96,7 @@ folderPath = "Z:/files/realsenseValidation/data/processing/001_BC_0.75" # r'D:/0
 serial = '822512060853'
 marker = 'LSAC'
 
-saveDict = np.load(os.path.join(folderPath,serial+'.npy'), allow_pickle = True).item()
+saveDict = np.load(os.path.join(folderPath,serial+'.npy'), allow_pickle = True).item() #reading all the data and creating variables
 frameList=saveDict['frameList']
 depthList=saveDict['depthList'] 
 poseMat=saveDict['poseMat'] 
@@ -113,7 +113,7 @@ px = 1
 allPoints = np.empty((3, 1, len(frameList)))
 f=0
 
-for v,videoFrame in enumerate(frameList):
+for v,videoFrame in enumerate(frameList): #Don't know what this does
     frames[f] = [[],[],[]]
     depths[f] = []
     kernel = np.ones((19, 19), np.uint8)
@@ -141,7 +141,7 @@ for v,videoFrame in enumerate(frameList):
     #bvideoFrame = cv2.medianBlur(videoFrame, 1)
     #bvideoFrame = videoFrame
     fail=0
-    if f <len(frameList):
+    if f <len(frameList): #Not sure what this means
         if trackers != []:
             depthFrame = depthList[f]
             print(depths[f-1])
@@ -163,13 +163,13 @@ for v,videoFrame in enumerate(frameList):
                 #(prevSuccess, prevboxN) = trackerTest.update(prevImage)
                 #if prevSuccess:
                     #if rectContains(prevboxN, prevCentroid):
-                if brightVal >= 0: #and diff < 20:
+                if brightVal >= 0: #and diff < 20: #if there is a marker in the box (indicated by brightness)
                     #jump.append(diff)
                     if prevImage:
-                        (prevSuccess, prevBoxN) = trackers[0].update(prevImage[0])
+                        (prevSuccess, prevBoxN) = trackers[0].update(prevImage[0]) #update "previous" image?
                         (px, py, pw, ph) = [int(v) for v in prevBoxN]
                         (px1, py1) = get_centroid(px,py,pw,ph)
-                        cv2.rectangle(prevImage[0], (px, py), (px + pw, py + ph), (155, 155, 155), 2)
+                        cv2.rectangle(prevImage[0], (px, py), (px + pw, py + ph), (155, 155, 155), 2) #What is the rest of this?
                         cv2.imshow(serial+'prev', prevImage[0])
                         cv2.waitKey(1) & 0xFF
                         #time.sleep(1/20)
@@ -242,9 +242,9 @@ for v,videoFrame in enumerate(frameList):
                 except:
                     pass
                 '''
-        if trackers == []:
+        if trackers == []: #what does this do?
             box = cv2.selectROI(serial, bvideoFrame, fromCenter=True, showCrosshair=True)
-            if not box == (0,0,0,0):
+            if not box == (0,0,0,0): #Not sure what this is
                 (x, y, w, h) = [int(v) for v in box]
                 ret, videoFrameT = cv2.threshold(videoFrame2,200,255,cv2.THRESH_BINARY)
                 contours, hierarchy = cv2.findContours(videoFrameT,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
@@ -252,7 +252,7 @@ for v,videoFrame in enumerate(frameList):
                 centroids = [get_centroid(cnt[0],cnt[1],cnt[2],cnt[3]) for cnt in contourBoxes]
                 #contourBoxes = [(box[0],box[1],box[2]+3,box[3]+3) for box in contourBoxes]
                 selectContains = [rectContains((x,y,w,h), (box[0],box[1])) for box in centroids]
-                try:
+                try: #do not understand
                     whichContour = [i for i,s in enumerate(selectContains) if s][0]
                     contourPoints = np.vstack(contours[whichContour]).squeeze()
                     centroid = centroids[whichContour]
@@ -286,7 +286,7 @@ for v,videoFrame in enumerate(frameList):
             else:
                 frames[f] = [[],[],[]] 
 
-        cv2.imshow(serial, bvideoFrame)
+        cv2.imshow(serial, bvideoFrame) #show the next frame?
         #cv2.imshow('blur',bvideoFrame)
         print(frames[f], f)
         #prevImage = bvideoFrame
@@ -294,7 +294,7 @@ for v,videoFrame in enumerate(frameList):
         #time.sleep(1/30)
         f+=1
 
-c3d = ezc3d.c3d()
+c3d = ezc3d.c3d() #need explanation through line 310
 
 c3dtocopy = ezc3d.c3d("2019_05_07_01.c3d")
 

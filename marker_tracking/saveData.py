@@ -20,10 +20,10 @@ for serial in cameraList:
     f=0
     for file in frameFiles:
 
-        with open(os.path.join(folderPath, file), 'rb') as fi:
-            deviceData = pickle.load(fi)
-        for camera in list(deviceData.keys()):
-            if camera == serial:
+        with open(os.path.join(folderPath, file), 'rb') as fi: #opens the file
+            deviceData = pickle.load(fi) #dictionary of the 6 cameras
+        for camera in list(deviceData.keys()): #key is camera serial number
+            if camera == serial: #what is this?
                 frameList.append(deviceData[camera]['infrared'])
                 depthList.append(deviceData[camera]['depth'])
                 poseMat = deviceData[camera]['poseMat']
@@ -34,6 +34,6 @@ for serial in cameraList:
     saveDict = {}
     saveDict['frameList'] = frameList
     saveDict['depthList'] = depthList
-    saveDict['poseMat'] = poseMat
-    saveDict['intrinsics'] = intrinsics
+    saveDict['poseMat'] = poseMat #4x4 transformation matrix from calibration
+    saveDict['intrinsics'] = intrinsics #where points exist in 3d
     np.save(os.path.join(savePath, serial+'.npy'), saveDict, allow_pickle=True)

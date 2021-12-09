@@ -19,12 +19,12 @@ def group_consecutives(vals, step=1):
             run = [v]
             result.append(run)
         expect = v + step
-    return result
+    return result #what is this?
 
-folderPath = r'D:\9.26\SB\walk1.75'
+folderPath = r'D:\9.26\SB\walk1.75' #what about back/forward slash?
 files = os.listdir(folderPath)
 
-order = ['822512060522', '822512060553', '822512060853', '822512061105','823112060112','823112060874']
+order = ['822512060522', '822512060553', '822512060853', '822512061105','823112060112','823112060874'] #what does this order signify
 
 #cameras = [file for file in files if file.endswith(".npy")]
 
@@ -33,12 +33,12 @@ order = ['822512060522', '822512060553', '822512060853', '822512061105','8231120
 cameraMarkers = {}
 for camera in order:
     serial = camera.split(".")[0]
-    cameraFiles = [file for file in files if file.startswith(serial)]
+    cameraFiles = [file for file in files if file.startswith(serial)] #bro...
     cameraMarkers[serial] = [file.split(".")[0][12:] for file in cameraFiles if file.endswith(".c3d")]
 
 markers = {}
-allPoints = np.zeros((3,0,1))
-for i, camera in enumerate(order):
+allPoints = np.zeros((3,0,1)) #is this is all the points (in a frame?)
+for i, camera in enumerate(order): #needs explanation through line 64
     for marker in cameraMarkers[camera]:
         source = ezc3d.c3d(os.path.join(folderPath,camera+marker+".c3d"))
         sourceAll = np.asarray([source['data']['points'][0], source['data']['points'][1], source['data']['points'][2]]).squeeze()
@@ -72,9 +72,9 @@ for mark in markers:
     for a in arr.T:
         v = a == np.array([0.,0.,0.,])
         if v.all():
-            gaps.append(i)
+            gaps.append(i) #what does this do?
         i+=1
-    if gaps!=[]:
+    if gaps!=[]: #and this?
         gaps = group_consecutives(gaps)
         print(mark, gaps)
         for g in range(0, len(gaps)):
@@ -108,7 +108,7 @@ for mark in markers:
 
 
 
-c3dtocopy = ezc3d.c3d("2019_05_07_01.c3d")
+c3dtocopy = ezc3d.c3d("2019_05_07_01.c3d") #don't really understand below here
 c3d = ezc3d.c3d()
 
 markerList = list(markers.keys())
