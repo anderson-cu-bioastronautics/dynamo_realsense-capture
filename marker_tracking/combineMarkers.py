@@ -21,7 +21,7 @@ def group_consecutives(vals, step=1):
         expect = v + step
     return result #what is this?
 
-folderPath = r'D:\9.26\SB\walk1.75' #what about back/forward slash?
+folderPath = 'S:\\files\\realsenseValidation\\data\\processing\\001_BC_0.75' #must change this, show where the camera+marker c3d files
 files = os.listdir(folderPath)
 
 order = ['822512060522', '822512060553', '822512060853', '822512061105','823112060112','823112060874'] #what does this order signify
@@ -126,5 +126,5 @@ c3d['data']['points'] = allPoints
 c3d.add_parameter('POINT', 'FRAMES', 899)
 c3d.add_parameter('POINT', 'SCALE', -0.01)
 #c3d.add_parameter('POINT', 'USED', len(lm_list))
-c3d.write(os.path.join(folderPath,'static'+".c3d"))
+c3d.write(os.path.join(folderPath,'static'+".c3d")) ##change name of the file to reflect the trial
 #np.save('cameraTransforms', cameraTransforms, allow_pickle=True)

@@ -2,8 +2,8 @@ import os
 import pickle
 import numpy as np
 
-folderPath = r'S:/files/realsenseValidation/aboppana/pilot/001_BB_0.75'
-savePath = r'D:/001_BB_0.75'
+folderPath = 'S:\\files\\realsenseValidation\\data\\pilot\\001_BB_0.75' #where the pickle files are located for a trial; these files are what is saved from the cameras
+savePath = 'S:\\files\\realsenseValidation\\data\\processing\\001_BB_0.75' #where we want to put the npy files converted from the pickle files, so we can track markers on individual cameras
 
 cameraList=['823112060874',
             '822512060522',
